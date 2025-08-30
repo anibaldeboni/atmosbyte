@@ -1,40 +1,32 @@
-# Instalação do Atmosbyte no Raspberry Pi
+# Atmosbyte installation on Raspberry Pi
 
-Este guia explica como instalar e configurar o Atmosbyte para inicializar automaticamente no boot do Raspberry Pi Zero 2W.
+This guide explains how to install and configure Atmosbyte to start automatically on boot on the Raspberry Pi Zero 2W.
 
-## Pré-requisitos
+## Requisites
 
-- Raspberry Pi Zero 2W com Raspberry Pi OS
-- Acesso SSH ou terminal local
-- Usuário com privilégios sudo (não necessariamente `pi`)
+- Raspberry Pi Zero 2W with Raspberry Pi OS
+- SSH access or local terminal
+- User with sudo privileges (not necessarily `pi`)
 
-## Opções de Instalação
+## Automatic installation
 
-Existem duas formas de instalar o serviço:
+### 1. Build the ARM64 binary
 
-1. **Com usuário dedicado (Recomendado)**: Cria um usuário específico `atmosbyte` para executar o serviço
-2. **Com usuário atual**: Usa seu usuário atual para executar o serviço
-
-## Instalação Automática (Recomendada)
-
-### 1. Construir o binário para ARM64
-
-No seu computador de desenvolvimento:
+On your development computer:
 
 ```bash
-# Construir o binário para Raspberry Pi
+# Build the binary for Raspberry Pi
 make build-rpi
 
-# Ou criar um pacote completo para deployment
+# Or create a complete package for deployment
 make package-rpi
 ```
 
-### 2. Transferir arquivos para o Raspberry Pi
-
-Copie os seguintes arquivos para o Raspberry Pi:
+### 2. Transfer files to the Raspberry Pi
+Copy the following files to the Raspberry Pi:
 
 ```bash
-# Usando scp (substitua PI_IP pelo IP do seu Raspberry Pi e USERNAME pelo seu usuário)
+# Using scp (replace PI_IP with your Raspberry Pi's IP and USERNAME with your user)
 scp bin/linux-arm64/atmosbyte USERNAME@PI_IP:~/
 scp atmosbyte.service USERNAME@PI_IP:~/
 scp install-service.sh USERNAME@PI_IP:~/
@@ -42,77 +34,33 @@ scp install-service-current-user.sh USERNAME@PI_IP:~/
 scp atmosbyte.yaml.example USERNAME@PI_IP:~/atmosbyte.yaml
 ```
 
-Ou se você criou o pacote:
+Or if you created the package:
 
 ```bash
 scp dist/atmosbyte-rpi-*.tar.gz USERNAME@PI_IP:~/
 ```
 
-### 3. Instalar no Raspberry Pi
-
-No Raspberry Pi:
+### 3. Install on the Raspberry Pi
+On the Raspberry Pi:
 
 ```bash
-# Se usando o pacote tar.gz
+# If using the tar.gz package
 tar -xzf atmosbyte-rpi-*.tar.gz
 
-# Editar a configuração conforme necessário
+# Edit the configuration as needed
 nano atmosbyte.yaml
 
-# Instalação o serviço
+# Install the service
 sudo ./install-service.sh
 ```
+#### Configuration
 
-**Detalhe da instalação:**
-
-- **Usuário dedicado**: Cria um usuário específico `atmosbyte` para executar o serviço (mais seguro)
-
-**Nota**: O script automaticamente detecta se o serviço atmosbyte já está rodando e o para antes de prosseguir com a instalação.
-
-## Instalação Manual
-
-### 1. Criar diretório de instalação
-
-```bash
-sudo mkdir -p /opt/atmosbyte
-sudo chown $(whoami):$(whoami) /opt/atmosbyte
-```
-
-### 2. Copiar arquivos
-
-```bash
-# Copiar binário
-sudo cp atmosbyte /opt/atmosbyte/
-sudo chmod +x /opt/atmosbyte/atmosbyte
-
-# Copiar configuração
-sudo cp atmosbyte.yaml /opt/atmosbyte/
-```
-
-### 3. Instalar serviço systemd
-
-```bash
-# Copiar arquivo de serviço
-sudo cp atmosbyte.service /etc/systemd/system/
-
-# Recarregar systemd
-sudo systemctl daemon-reload
-
-# Habilitar e iniciar serviço
-sudo systemctl enable atmosbyte
-sudo systemctl start atmosbyte
-```
-
-## Configuração
-
-### Arquivo de configuração
-
-Edite `/opt/atmosbyte/atmosbyte.yaml` conforme suas necessidades:
+Edit `atmosbyte.yaml` as needed:
 
 ```yaml
-# Exemplo de configuração básica
+# Example of basic configuration
 sensor:
-  type: "hardware"  # ou "simulated" para testes
+  type: "hardware"  # or "simulated" for testing
   
 web:
   port: 8080
@@ -121,101 +69,95 @@ database:
   path: "/opt/atmosbyte/data.db"
   
 openweather:
-  api_key: "sua_api_key_aqui"
-  station_id: "sua_station_id"
+  api_key: "your_api_key_here"
+  station_id: "your_station_id"
 ```
 
-### Verificar logs GPIO (se usando sensor hardware)
+**Installation details:**
+
+- **Dedicated user:** Creates a specific user atmosbyte to run the service (more secure)
+**Note:** The script automatically detects if the atmosbyte service is already running and stops it before proceeding with the installation.
+
+## Useful Commands
+
+### Manage the service
 
 ```bash
-# Verificar se o usuário tem acesso ao GPIO (substitua USERNAME pelo seu usuário)
-sudo usermod -a -G gpio USERNAME
-
-# Habilitar I2C (necessário para BME280)
-sudo raspi-config
-# Navigate to: Interface Options > I2C > Enable
-```
-
-## Comandos Úteis
-
-### Gerenciar o serviço
-
-```bash
-# Verificar status
+# Check status
 sudo systemctl status atmosbyte
 
-# Ver logs em tempo real
+# View logs in real time
 sudo journalctl -u atmosbyte -f
 
-# Reiniciar serviço
+# Restart service
 sudo systemctl restart atmosbyte
 
-# Parar serviço
+# Stop service
 sudo systemctl stop atmosbyte
 
-# Desabilitar auto-inicialização
+# Disable auto-start
 sudo systemctl disable atmosbyte
 ```
 
-### Logs e diagnóstico
+### Logs and diagnostics
 
 ```bash
-# Ver logs das últimas 24 horas
+# View logs from the last 24 hours
 sudo journalctl -u atmosbyte --since "24 hours ago"
 
-# Ver logs com mais detalhes
+# View logs in more detail
 sudo journalctl -u atmosbyte -l --no-pager
 
-# Verificar se o serviço está habilitado para boot
+# Check if the service is enabled at boot
 sudo systemctl is-enabled atmosbyte
 ```
 
-### Atualizar aplicação
+### Update application
 
 ```bash
-# Parar serviço
+# Stop service
 sudo systemctl stop atmosbyte
 
-# Substituir binário
-sudo cp novo_atmosbyte /opt/atmosbyte/atmosbyte
+# Replace binary
+sudo cp new_atmosbyte /opt/atmosbyte/atmosbyte
 
-# Iniciar serviço
+# Start service
 sudo systemctl start atmosbyte
 ```
+**Note:** If you're using the installtion script you don't need to follow the steps above
 
 ## Troubleshooting
 
-### Serviço não inicia
+### Service does not start
 
-1. Verificar logs: `sudo journalctl -u atmosbyte -l`
-2. Verificar permissões: `ls -la /opt/atmosbyte/`
-3. Testar binário manualmente: `cd /opt/atmosbyte && ./atmosbyte`
+1. Check logs: `sudo journalctl -u atmosbyte -l`
+2. Check permissions: `ls -la /opt/atmosbyte/`
+3. Test binary manually: `cd /opt/atmosbyte && ./atmosbyte`
 
-### Problemas com sensor BME280
+### Problems with BME280 sensor
+1. Check if I2C is enabled: sudo raspi-config
+2. Check I2C devices: sudo i2cdetect -y 1
+3. Check GPIO permissions: groups USERNAME (should include gpio)
+    - If using dedicated user: groups atmosbyte
 
-1. Verificar se I2C está habilitado: `sudo raspi-config`
-2. Verificar dispositivos I2C: `sudo i2cdetect -y 1`
-3. Verificar permissões GPIO: `groups USERNAME` (deve incluir `gpio`)
-   - Se usando usuário dedicado: `groups atmosbyte`
-
-### Problemas de permissão
+### Permission problems
 
 ```bash
-# Corrigir permissões (substitua USERNAME pelo usuário que executa o serviço)
-sudo chown -R USERNAME:USERNAME /opt/atmosbyte
+# Fix permissions
+sudo chown -R atmosbyte:atmosbyte /opt/atmosbyte
 sudo chmod +x /opt/atmosbyte/atmosbyte
 
-# Se usando usuário dedicado
+# If using dedicated user
 sudo chown -R atmosbyte:atmosbyte /opt/atmosbyte
 ```
 
-### Desinstalar
+### Uninstall
 
 ```bash
-# Usando o Makefile (no diretório do projeto)
+# Using the Makefile (in the project directory)
 make uninstall-service
 
-# Ou manualmente
+# Or manually
 sudo systemctl stop atmosbyte
 sudo systemctl disable atmosbyte
 sudo rm /etc/systemd/system/atmosbyte.service
@@ -223,18 +165,16 @@ sudo systemctl daemon-reload
 sudo rm -rf /opt/atmosbyte
 ```
 
-## Monitoramento
+## Monitoring
 
-O serviço será automaticamente:
-- Iniciado no boot
-- Reiniciado em caso de falha (máximo 3 tentativas em 60 segundos)
-- Logado no journal do systemd
-
-Para monitoramento contínuo, você pode usar:
+The service will be automatically:
+- Started on boot
+- Restarted in case of failure (maximum 3 attempts in 60 seconds)
+- Logged in the systemd journal
+For continuous monitoring, you can use:
 
 ```bash
-# Criar um alias útil
+# Create a useful alias
 echo 'alias atmosbyte-status="sudo systemctl status atmosbyte"' >> ~/.bashrc
 echo 'alias atmosbyte-logs="sudo journalctl -u atmosbyte -f"' >> ~/.bashrc
-source ~/.bashrc
 ```

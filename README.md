@@ -2,6 +2,10 @@
 
 A comprehensive weather data collection, processing, and visualization system built in Go, featuring centralized YAML configuration, BME280 sensor integration, generic queue system with retry/circuit breaker patterns, OpenWeather API client, and a real-time web interface.
 
+## 💽 Raspberry Pi installation
+
+Check the [Installation Guide](INSTALL-RPI.md)
+
 ## 🎯 Key Features
 
 ### **Centralized Configuration System**
@@ -41,52 +45,14 @@ A comprehensive weather data collection, processing, and visualization system bu
 - **Responsive Design**: Mobile-friendly interface with modern styling
 - **Status Monitoring**: Real-time system health and sensor status
 
-## 📁 Project Structure
-
-```
-atmosbyte/
-├── config/                   # Centralized configuration system
-│   ├── config.go            # Core configuration loading and defaults
-│   ├── adapters.go          # Type-safe configuration adapters
-│   ├── testing.go           # Configuration helpers for tests
-│   └── config_test.go       # Configuration system tests
-├── bme280/                   # BME280 sensor package
-│   ├── bme280.go            # Core sensor implementation with I2C communication
-│   └── bme280_test.go       # Comprehensive unit tests and benchmarks
-├── queue/                    # Generic queue system with retry logic
-│   ├── queue.go             # Core queue implementation with circuit breaker
-│   └── queue_test.go        # Comprehensive test suite with retry scenarios
-├── openweather/              # OpenWeather API client package
-│   └── openweather.go       # HTTP client for weather station API
-├── web/                      # Real-time web interface package
-│   ├── server.go            # HTTP server and configuration
-│   ├── handlers.go          # API endpoint handlers
-│   ├── responses.go         # Response type definitions
-│   ├── types.go             # Web-specific type definitions
-│   ├── config.go            # Web server configuration
-│   ├── middleware.go        # HTTP middleware components
-│   ├── web_test.go          # HTTP handler tests and API validation
-│   └── templates/           # HTML templates for web interface
-│       └── index.html       # Main dashboard with live data and queue status
-├── main.go                   # Application coordinator and OpenWeather worker
-├── sensor_reader.go          # Sensor data collection workers (BME280/simulated)
-├── queue_worker.go           # Queue worker implementation for measurement processing
-├── atmosbyte.yaml.example    # Example configuration file with all options
-├── test-config.yaml          # Test configuration for automated testing
-├── go.mod                    # Go module definition and dependencies
-├── go.sum                    # Dependency checksums
-├── .env.example              # Environment variables template
-└── README.md                 # This comprehensive documentation
-```
-
 ## 🚀 Quick Start
 
 ### 1. Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/anibaldeboni/zero-paper.git
-cd zero-paper/atmosbyte
+git clone https://github.com/anibaldeboni/atmosbyte.git
+cd atmosbyte
 
 # Install BME280 hardware dependencies (for real hardware)
 go get periph.io/x/conn/v3/...
@@ -130,23 +96,6 @@ The application searches for configuration files in the following order:
 6. `/etc/atmosbyte/atmosbyte.yaml`
 7. `/etc/atmosbyte.yaml`
 
-### 3. Environment Variables
-
-```bash
-# Copy example configuration
-cp .env.example .env
-
-# Set your credentials
-export OPENWEATHER_API_KEY="your_api_key"
-export STATION_ID="your_weather_station_id"
-
-# Use simulated sensor for development (default)
-export USE_SIMULATED_SENSOR="true"
-
-# Use real BME280 hardware (Raspberry Pi)
-export USE_SIMULATED_SENSOR="false"
-```
-
 ### 4. Running the System
 
 ```bash
@@ -155,9 +104,6 @@ export USE_SIMULATED_SENSOR="false"
 
 # Production mode with default config discovery
 ./atmosbyte
-
-# Using environment override for sensor type
-USE_SIMULATED_SENSOR=true ./atmosbyte
 
 # Development with Go run
 go run . --config=atmosbyte.yaml
@@ -187,7 +133,7 @@ $ ./atmosbyte --config=dev-config.yaml
 2025/08/01 12:00:00 Loading configuration from dev-config.yaml
 2025/08/01 12:00:00 Starting Atmosbyte - Weather Data Processing System
 2025/08/01 12:00:00 Using simulated sensor data
-2025/08/01 12:00:00 🌐 Starting HTTP server on :8080
+2025/08/01 12:00:00 Starting HTTP server on :8080
 2025/08/01 12:00:00 Starting simulated sensor worker (generating data every 5s)
 ```
 
@@ -210,7 +156,7 @@ sensor:
 $ ./atmosbyte --config=dev-config.yaml
 2025/08/01 12:00:00 Starting Atmosbyte - Weather Data Processing System
 2025/08/01 12:00:00 Using simulated sensor data
-2025/08/01 12:00:00 🌐 Starting HTTP server on :8080
+2025/08/01 12:00:00 Starting HTTP server on :8080
 2025/08/01 12:00:10 Simulated reading enqueued: temp=27.5°C, humidity=62.3%, pressure=101250 Pa
 ```
 
@@ -276,6 +222,7 @@ go run . --config=dev-config.yaml
 ### **Real-time Dashboard**
 
 - **Live Data Display**: Temperature, humidity, and pressure with auto-refresh
+- **Historical data**: Queries the local database to display historical meteorological data
 - **Sensor Status**: Visual indicators for hardware/simulated sensor status
 - **Queue Monitoring**: Real-time queue status with circuit breaker state
 - **System Monitoring**: Real-time system health and last update timestamps
@@ -400,20 +347,6 @@ If no configuration file is found or values are missing, the application uses se
 | `sensor.type`               | "simulated"   | Use simulated sensor    |
 | `sensor.read_interval`      | 10s           | Sensor reading interval |
 | `timeouts.shutdown_timeout` | 10s           | Graceful shutdown time  |
-
-### Advanced Configuration
-
-### Environment Variables
-
-Environment variables are primarily used for sensitive data and runtime overrides:
-
-| Variable               | Description          | Default | Required | Notes                            |
-| ---------------------- | -------------------- | ------- | -------- | -------------------------------- |
-| `OPENWEATHER_API_KEY`  | OpenWeather API key  | -       | ✅       | Keep secure, don't commit to git |
-| `STATION_ID`           | Weather station ID   | -       | ✅       | Your weather station identifier  |
-| `USE_SIMULATED_SENSOR` | Override sensor type | `false` | ❌       | Overrides YAML `sensor.type`     |
-
-**Note**: For most configuration options, prefer YAML files over environment variables for better organization and documentation.
 
 ### BME280 Configuration
 
@@ -612,9 +545,9 @@ Worker 0: Error processing message: HTTP 401: Invalid API key
 
 **Solutions:**
 
-1. Verify `OPENWEATHER_API_KEY` is correct
+1. Verify `openweather.app_id` is correct
 2. Ensure API key has access to the required endpoints
-3. Check `STATION_ID` is valid
+3. Check `openweather.station_id` is valid
 
 ### Web Interface Not Accessible
 
@@ -660,6 +593,7 @@ Queue stats - CircuitBreaker: Open
 4. **Processing Layer**: OpenWeatherWorker (in main.go) processes queue messages and sends to API
 5. **Web Layer**: Real-time interface with direct sensor access and queue monitoring
 6. **API Layer**: RESTful endpoints for measurements, health, and queue status
+7. **Repository Layer**: Handle local data persistence using SQLite
 
 ### Design Principles
 
@@ -716,38 +650,6 @@ Queue stats - CircuitBreaker: Open
 - [periph.io - Go Hardware Library](https://periph.io/)
 - [BME280 Datasheet](https://www.bosch-sensortec.com/products/environmental-sensors/humidity-sensors-bme280/)
 - [Go Templates Documentation](https://pkg.go.dev/html/template)
-
-## 📈 Recent Improvements & Roadmap
-
-### ✅ Recently Implemented
-
-- **Centralized Configuration System**: YAML-based configuration with thread-safe loading
-- **Type-Safe Adapters**: Clean conversion between config and package-specific types
-- **Removal of Redundant Defaults**: Eliminated duplicate default functions across packages
-- **Idiomatic Go Naming**: Refactored method names to follow Go conventions
-- **Simplified Configuration**: Removed unused fields (Environment, Seed) for cleaner config
-- **Enhanced Testing**: Comprehensive test coverage with configuration helpers
-
-### Near Term
-
-- [ ] **Metrics Integration**: Prometheus/Grafana support
-- [ ] **Database Storage**: SQLite for local persistence
-- [ ] **Alert System**: Threshold-based notifications
-- [ ] **Configuration Validation**: Schema validation for YAML files
-
-### Medium Term
-
-- [ ] **Docker Support**: Containerization for easy deployment
-- [ ] **Multiple Sensors**: Support for additional sensor types
-- [ ] **Data Export**: CSV/JSON export functionality
-- [ ] **Historical Data**: Trends and historical views
-
-### Long Term
-
-- [ ] **Cloud Integration**: AWS/Azure/GCP deployment
-- [ ] **Machine Learning**: Predictive analytics
-- [ ] **Mobile App**: Native mobile applications
-- [ ] **Distributed System**: Multi-node sensor networks
 
 ---
 
