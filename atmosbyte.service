@@ -1,0 +1,38 @@
+[Unit]
+Description=Atmosbyte Weather Data Processing System
+Documentation=https://github.com/anibaldeboni/zero-paper
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=atmosbyte
+Group=atmosbyte
+WorkingDirectory=/opt/atmosbyte
+ExecStart=/opt/atmosbyte/atmosbyte -config /opt/atmosbyte/atmosbyte.yaml
+Restart=always
+RestartSec=5
+StartLimitInterval=60
+StartLimitBurst=3
+
+# Environment variables
+Environment=HOME=/opt/atmosbyte
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=atmosbyte
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/opt/atmosbyte /tmp
+
+# Resource limits
+MemoryMax=128M
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target
