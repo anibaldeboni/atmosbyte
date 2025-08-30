@@ -1,6 +1,6 @@
 [Unit]
 Description=Atmosbyte Weather Data Processing System
-Documentation=https://github.com/anibaldeboni/zero-paper
+Documentation=https://github.com/anibaldeboni/atmosbyte
 After=network.target network-online.target
 Wants=network-online.target
 
