@@ -8,7 +8,7 @@ import (
 )
 
 // sendJSONResponse sends a JSON response with proper headers
-func (s *Server) sendJSONResponse(w http.ResponseWriter, data interface{}, statusCode int) {
+func (s *Server) sendJSONResponse(w http.ResponseWriter, data any, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(statusCode)
