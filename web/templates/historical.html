@@ -432,36 +432,51 @@
           return;
         }
 
-        const labels = [];
-        const tempMaxData = [];
-        const tempMinData = [];
-        const tempAvgData = [];
-        const humidityData = [];
-        const pressureMaxData = [];
-        const pressureMinData = [];
-        const pressureAvgData = [];
+        const {
+          labels,
+          tempMaxData,
+          tempMinData,
+          tempAvgData,
+          humidityData,
+          pressureMaxData,
+          pressureMinData,
+          pressureAvgData,
+        } = data.reduce(
+          (acc, measurement) => {
+            const timeLabel = new Date(measurement.date * 1000).toLocaleString(
+              "pt-BR"
+            );
 
-        data.forEach((measurement) => {
-          const timeLabel = new Date(measurement.date * 1000).toLocaleString(
-            "pt-BR"
-          );
-          labels.push(timeLabel);
-          tempMaxData.push(measurement.temp?.max || null);
-          tempMinData.push(measurement.temp?.min || null);
-          tempAvgData.push(measurement.temp?.average || null);
-          humidityData.push(measurement.humidity?.average || null);
-          pressureMaxData.push(
-            measurement.pressure?.max ? measurement.pressure.max / 100 : null
-          );
-          pressureMinData.push(
-            measurement.pressure?.min ? measurement.pressure.min / 100 : null
-          );
-          pressureAvgData.push(
-            measurement.pressure?.average
-              ? measurement.pressure.average / 100
-              : null
-          );
-        });
+            acc.labels.push(timeLabel);
+            acc.tempMaxData.push(measurement.temp?.max || null);
+            acc.tempMinData.push(measurement.temp?.min || null);
+            acc.tempAvgData.push(measurement.temp?.average || null);
+            acc.humidityData.push(measurement.humidity?.average || null);
+            acc.pressureMaxData.push(
+              measurement.pressure?.max ? measurement.pressure.max / 100 : null
+            );
+            acc.pressureMinData.push(
+              measurement.pressure?.min ? measurement.pressure.min / 100 : null
+            );
+            acc.pressureAvgData.push(
+              measurement.pressure?.average
+                ? measurement.pressure.average / 100
+                : null
+            );
+
+            return acc;
+          },
+          {
+            labels: [],
+            tempMaxData: [],
+            tempMinData: [],
+            tempAvgData: [],
+            humidityData: [],
+            pressureMaxData: [],
+            pressureMinData: [],
+            pressureAvgData: [],
+          }
+        );
 
         const legendConfig = {
           display: true,
