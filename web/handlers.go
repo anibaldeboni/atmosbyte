@@ -82,7 +82,7 @@ func (s *Server) handleHistoricalWeather(w http.ResponseWriter, r *http.Request)
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	if err := s.historicalTemplate.Execute(w, nil); err != nil {
+	if err := s.historicalTempl.Execute(w, nil); err != nil {
 		log.Printf("Failed to execute historical template: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
@@ -135,7 +135,6 @@ func (s *Server) handleHistoricalWeatherAPI(w http.ResponseWriter, r *http.Reque
 		toTime = time.Now()
 	}
 
-	// Check if repository is available
 	if s.repository == nil {
 		s.sendErrorResponse(w, "Repository not configured", http.StatusServiceUnavailable)
 		return
@@ -170,8 +169,17 @@ func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	if err := s.template.Execute(w, data); err != nil {
+	if err := s.indexTempl.Execute(w, data); err != nil {
 		log.Printf("Failed to execute template: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
+}
+
+func (s *Server) handleNotFound(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	if err := s.notFoundTempl.Execute(w, nil); err != nil {
+		log.Printf("Failed to execute 404 template: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }

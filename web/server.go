@@ -21,19 +21,23 @@ var indexTemplate string
 //go:embed templates/historical.html
 var historicalTemplate string
 
+//go:embed templates/404.html
+var notFoundTemplate string
+
 // Server encapsulates the HTTP server configuration and dependencies
 type Server struct {
-	config             *Config
-	htmlData           *TemplateData
-	sensor             bme280.Reader
-	template           *template.Template
-	historicalTemplate *template.Template
-	server             *http.Server
-	routes             map[string]string
-	queue              QueueStatsProvider
-	ctx                context.Context
-	systemStartTime    time.Time
-	repository         MeasurementRepository
+	config          *Config
+	htmlData        *TemplateData
+	sensor          bme280.Reader
+	indexTempl      *template.Template
+	historicalTempl *template.Template
+	notFoundTempl   *template.Template
+	server          *http.Server
+	routes          map[string]string
+	queue           QueueStatsProvider
+	ctx             context.Context
+	systemStartTime time.Time
+	repository      MeasurementRepository
 }
 
 type MeasurementProvider interface {
@@ -62,14 +66,20 @@ func NewServer(ctx context.Context, sensor bme280.Reader, config *Config, queue 
 		log.Fatalf("Failed to parse historical template: %v", err)
 	}
 
+	notFoundTmpl, err := template.New("404").Parse(notFoundTemplate)
+	if err != nil {
+		log.Fatalf("Failed to parse 404 template: %v", err)
+	}
+
 	s := &Server{
-		config:             config,
-		sensor:             sensor,
-		template:           tmpl,
-		historicalTemplate: historicalTmpl,
-		queue:              queue,
-		ctx:                ctx,
-		systemStartTime:    time.Now(), // Thread-safe: set once during initialization
+		config:          config,
+		sensor:          sensor,
+		indexTempl:      tmpl,
+		historicalTempl: historicalTmpl,
+		notFoundTempl:   notFoundTmpl,
+		queue:           queue,
+		ctx:             ctx,
+		systemStartTime: time.Now(), // Thread-safe: set once during initialization
 		routes: map[string]string{
 			"/":             "Interface web principal",
 			"/health":       "Status de saúde do sistema",
@@ -102,7 +112,8 @@ func (s *Server) setupRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/queue", s.handleQueue)
 	mux.HandleFunc("/historical", s.handleHistoricalWeather)
 	mux.HandleFunc("/data", s.handleHistoricalWeatherAPI)
-	mux.HandleFunc("/", s.handleRoot)
+	mux.HandleFunc("GET /{$}", s.handleRoot)
+	mux.HandleFunc("/", s.handleNotFound)
 }
 
 // GetRoutes returns the configured routes and their descriptions
