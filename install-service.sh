@@ -143,10 +143,6 @@ install_files() {
     cp "$CONFIG_FILE" "$INSTALL_DIR/"
     chown "$SERVICE_USER:$SERVICE_GROUP" "$INSTALL_DIR/$CONFIG_FILE"
     
-    # Create data directory for database and logs
-    mkdir -p "$INSTALL_DIR/data"
-    chown "$SERVICE_USER:$SERVICE_GROUP" "$INSTALL_DIR/data"
-    
     print_success "Files installed successfully"
 }
 
