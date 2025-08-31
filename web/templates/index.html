@@ -381,8 +381,11 @@
           <div class="status-item">
             <div class="status-label">Status do sistema</div>
             <div class="status-value" id="system-status">
-              <span class="status-indicator status-connected"></span>
-              Operacional
+              <span
+                class="status-indicator status-connected"
+                id="status-indicator"
+              ></span>
+              <span id="system-text">Operacional</span>
             </div>
           </div>
           <div class="status-item">
@@ -396,15 +399,18 @@
             <div class="status-label">Última atualização</div>
             <div class="status-value" id="last-update">Carregando...</div>
           </div>
-          {{if .QueueAvailable}}
+          <!-- {{if .QueueAvailable}} -->
           <div class="status-item">
             <div class="status-label">Fila de processamento</div>
             <div class="status-value" id="queue-status">
-              <span class="status-indicator status-connected"></span>
+              <span
+                class="status-indicator status-connected"
+                id="queue-indicator"
+              ></span>
               <span id="queue-text">Carregando...</span>
             </div>
           </div>
-          {{end}}
+          <!-- {{end}} -->
         </div>
       </div>
 
@@ -501,60 +507,107 @@
         }
       }
 
-      function updateWeatherData(data) {
-        document.getElementById("temp-value").textContent =
-          data.temperature.toFixed(1);
-        document.getElementById("humidity-value").textContent =
-          data.humidity.toFixed(1);
-        document.getElementById("pressure-value").textContent = Math.round(
-          data.pressure / 100
-        ); // Convert Pa to hPa
-
-        const timestamp = new Date(data.timestamp).toLocaleString("pt-BR");
-        document.getElementById("last-update").textContent = timestamp;
+      function updateWeatherData(dataPromise) {
+        let temperature = "--";
+        let humidity = "--";
+        let pressure = "--";
+        let lastUpdate = "--";
+        if (dataPromise.status == "fulfilled") {
+          temperature = dataPromise.value.temperature.toFixed(1);
+          humidity = dataPromise.value.humidity.toFixed(1);
+          pressure = Math.round(dataPromise.value.pressure / 100); // Convert Pa to hPa
+          lastUpdate = new Date(dataPromise.value.timestamp).toLocaleString(
+            "pt-BR"
+          );
+        }
+        document.getElementById("temp-value").textContent = temperature;
+        document.getElementById("humidity-value").textContent = humidity;
+        document.getElementById("pressure-value").textContent = pressure;
+        document.getElementById("last-update").textContent = lastUpdate;
       }
 
-      function updateSensorStatus(sensorStatus) {
-        const indicator = document.getElementById("sensor-indicator");
-        const text = document.getElementById("sensor-text");
+      function updateSystemStatus(systemPromise) {
+        const systemIndicator = document.getElementById("status-indicator");
+        const systemText = document.getElementById("system-text");
+        systemIndicator.className = "status-indicator";
 
-        indicator.className = "status-indicator";
+        let indicator = "status-error";
+        let text = "Não operacional";
+        if (
+          systemPromise.status == "fulfilled" &&
+          systemPromise?.value?.status === "healthy"
+        ) {
+          indicator = "status-connected";
+          text = "Operacional";
+        }
 
+        systemIndicator.classList.add(indicator);
+        systemText.textContent = text;
+      }
+
+      function updateSensorStatus(sensorPromise) {
+        const sensorIndicator = document.getElementById("sensor-indicator");
+        const sensorText = document.getElementById("sensor-text");
+
+        sensorIndicator.className = "status-indicator";
+        let sensorStatus = "error";
+
+        if (sensorPromise.status == "fulfilled") {
+          sensorStatus = sensorPromise.value.sensor;
+        }
+        let indicator, text;
         switch (sensorStatus) {
           case "connected":
-            indicator.classList.add("status-connected");
-            text.textContent = "BME280 Conectado";
+            indicator = "status-connected";
+            text = "BME280 conectado";
             break;
           case "simulated":
-            indicator.classList.add("status-simulated");
-            text.textContent = "Dados Simulados";
+            indicator = "status-simulated";
+            text = "Dados simulados";
             break;
           case "error":
-            indicator.classList.add("status-error");
-            text.textContent = "Erro no Sensor";
+            indicator = "status-error";
+            text = "Erro no sensor";
             break;
           default:
-            indicator.classList.add("status-error");
-            text.textContent = "Status desconhecido";
+            indicator = "status-error";
+            text = "Status desconhecido";
         }
+
+        sensorIndicator.classList.add(indicator);
+        sensorText.textContent = text;
       }
 
-      function updateQueueStatus(queueData) {
-        const queueElement = document.getElementById("queue-text");
-        if (!queueElement) return; // Queue not available
+      function updateQueueStatus(queuePromise) {
+        const queueText = document.getElementById("queue-text");
+        const queueIndicator = document.getElementById("queue-indicator");
 
-        const { queue_size, retry_queue_size, circuit_breaker_state, workers } =
-          queueData;
+        queueIndicator.className = "status-indicator";
 
-        // Mapear estados do circuit breaker
-        const stateNames = {
-          0: "Fechado",
-          1: "Aberto",
-          2: "Meio-aberto",
-        };
+        let indicator = "status-error";
+        let text = "--";
 
-        const stateName = stateNames[circuit_breaker_state] || "Desconhecido";
-        queueElement.textContent = `${queue_size} itens (${stateName})`;
+        if (queuePromise.status == "fulfilled") {
+          const {
+            queue_size,
+            retry_queue_size,
+            circuit_breaker_state,
+            workers,
+          } = queuePromise.value;
+
+          const stateNames = {
+            0: "Fechado",
+            1: "Aberto",
+            2: "Meio-aberto",
+          };
+
+          const stateName = stateNames[circuit_breaker_state] || "Desconhecido";
+          text = `${queue_size} itens (${stateName})`;
+          indicator = "status-connected";
+        }
+
+        queueIndicator.classList.add(indicator);
+        queueText.textContent = text;
       }
 
       function showError(message) {
@@ -575,34 +628,30 @@
         }
       }
 
-      async function refreshData() {
+      function executeLoading(func) {
         setLoading(true);
+        func().finally(() => setLoading(false));
+      }
 
-        try {
-          const promises = [fetchMeasurements(), fetchHealth()];
-
-          const queueAvailable = "{{.QueueAvailable}}" === "true";
-          if (queueAvailable) {
-            promises.push(fetchQueueStatus());
-          }
-
-          const results = await Promise.all(promises);
-          const [measurements, health] = results;
+      async function refreshData() {
+        executeLoading(async () => {
+          const results = await Promise.allSettled([
+            fetchMeasurements(),
+            fetchHealth(),
+            fetchQueueStatus(),
+          ]);
+          const [measurements, health, queue] = results;
 
           updateWeatherData(measurements);
-          updateSensorStatus(health.sensor);
+          updateSensorStatus(health);
+          updateSystemStatus(health);
+          updateQueueStatus(queue);
 
-          if (queueAvailable && results.length > 2) {
-            updateQueueStatus(results[2]);
-          }
-
-          // Clear any previous errors
           document.getElementById("error-container").innerHTML = "";
-        } catch (error) {
-          showError(`Falha ao atualizar dados: ${error.message}`);
-        } finally {
-          setLoading(false);
-        }
+          if (results.some((result) => result.status === "rejected")) {
+            showError("Falha ao atualizar dados");
+          }
+        });
       }
 
       function startAutoRefresh() {
