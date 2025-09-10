@@ -1,6 +1,6 @@
 module github.com/anibaldeboni/zero-paper/atmosbyte
 
-go 1.24.0
+go 1.25.0
 
 require (
 	periph.io/x/conn/v3 v3.7.2
