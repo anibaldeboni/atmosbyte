@@ -5,3 +5,10 @@ bin/
 dist/
 atmosbyte.yaml
 *Zone.identifier
+
+# Build artifacts
+web/templates-min/
+
+# Node.js dependencies
+node_modules/
+package-lock.json

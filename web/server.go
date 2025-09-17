@@ -2,7 +2,6 @@ package web
 
 import (
 	"context"
-	_ "embed"
 	"fmt"
 	"html/template"
 	"log"
@@ -14,15 +13,6 @@ import (
 	"github.com/anibaldeboni/zero-paper/atmosbyte/openweather"
 	"github.com/anibaldeboni/zero-paper/atmosbyte/repository"
 )
-
-//go:embed templates/index.html
-var indexTemplate string
-
-//go:embed templates/historical.html
-var historicalTemplate string
-
-//go:embed templates/404.html
-var notFoundTemplate string
 
 // Server encapsulates the HTTP server configuration and dependencies
 type Server struct {
