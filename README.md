@@ -1,6 +1,6 @@
 # Atmosbyte - Weather Data Processing System
 
-A comprehensive weather data collection, processing, and visualization system built in Go, featuring centralized YAML configuration, BME280 sensor integration, generic queue system with retry/circuit breaker patterns, OpenWeather API client, and a real-time web interface.
+A comprehensive weather data collection, processing, and visualization system built in Go, featuring centralized YAML configuration, BME280 sensor integration, generic queue system with retry/circuit breaker patterns, SQLite persistence, and a real-time web interface.
 
 ## 💽 Raspberry Pi installation
 
@@ -21,7 +21,6 @@ Check the [Installation Guide](INSTALL-RPI.md)
 - **Config Package**: Centralized configuration management with type-safe adapters
 - **BME280 Package**: Clean hardware sensor abstraction with I2C communication
 - **Queue Package**: Generic queue system with retry logic and circuit breaker
-- **OpenWeather Package**: HTTP client for OpenWeather API integration
 - **Web Package**: Real-time web interface with configurable endpoints and timeouts
 - **Central Coordination**: `main.go` orchestrates all components with clean separation
 
@@ -315,10 +314,6 @@ sensor:
     min_pressure: 98000
     max_pressure: 102000
 
-# OpenWeather API configuration
-openweather:
-  timeout: 30s
-
 # Timeout configurations
 timeouts:
   shutdown_timeout: 10s
@@ -537,18 +532,6 @@ Failed to initialize BME280 sensor: failed to open I2C bus
 3. Use `i2cdetect -y 1` to scan for devices
 4. System will automatically fallback to simulation
 
-### OpenWeather API Errors
-
-```
-Worker 0: Error processing message: HTTP 401: Invalid API key
-```
-
-**Solutions:**
-
-1. Verify `openweather.app_id` is correct
-2. Ensure API key has access to the required endpoints
-3. Check `openweather.station_id` is valid
-
 ### Web Interface Not Accessible
 
 ```
@@ -570,7 +553,7 @@ Queue stats - CircuitBreaker: Open
 **Solutions:**
 
 1. Wait for automatic recovery timeout
-2. Check network connectivity to OpenWeather API
+2. Check local repository/database availability
 3. Review detailed error logs
 
 ## 🏗️ Architecture Details
@@ -578,11 +561,11 @@ Queue stats - CircuitBreaker: Open
 ### Data Flow
 
 ```
-[BME280/Simulated] → [SensorWorker] → [Queue] → [OpenWeatherWorker] → [OpenWeather API]
+[BME280/Simulated] → [SensorWorker] → [Queue] → [RepositoryWorker] → [SQLite]
                          ↓
                    [Web Interface] ← [Direct Sensor Access] ← [Live Data]
                          ↓
-                   [Queue Status API] ← [Queue Monitoring] ← [Queue Stats]
+                    [Queue Status API] ← [Queue Monitoring] ← [Queue Stats]
 ```
 
 ### Component Interaction
@@ -590,10 +573,10 @@ Queue stats - CircuitBreaker: Open
 1. **Sensor Layer**: BME280 or simulated sensor provides real-time measurements
 2. **Collection Layer**: SensorWorker collects data at configurable intervals
 3. **Queue Layer**: Generic queue system with retry logic and circuit breaker protection
-4. **Processing Layer**: OpenWeatherWorker (in main.go) processes queue messages and sends to API
+4. **Processing Layer**: RepositoryWorker (in main.go) processes queue messages and persists to SQLite
 5. **Web Layer**: Real-time interface with direct sensor access and queue monitoring
 6. **API Layer**: RESTful endpoints for measurements, health, and queue status
-7. **Repository Layer**: Handle local data persistence using SQLite
+7. **Repository Layer**: Handles local data persistence using SQLite
 
 ### Design Principles
 
@@ -629,12 +612,11 @@ Queue stats - CircuitBreaker: Open
 - [ ] I2C permissions set correctly
 - [ ] Systemd service configured (optional)
 
-### API Configuration
+### Data Persistence Configuration
 
-- [ ] Valid OpenWeather API key in environment
-- [ ] Correct Station ID configured
-- [ ] API rate limits verified
-- [ ] Network connectivity tested
+- [ ] SQLite database path configured
+- [ ] Disk space and write permissions verified
+- [ ] Backup/retention strategy reviewed
 
 ### Security Considerations
 
@@ -646,7 +628,6 @@ Queue stats - CircuitBreaker: Open
 
 ## 🔗 References
 
-- [OpenWeather API Documentation](https://openweathermap.org/api)
 - [periph.io - Go Hardware Library](https://periph.io/)
 - [BME280 Datasheet](https://www.bosch-sensortec.com/products/environmental-sensors/humidity-sensors-bme280/)
 - [Go Templates Documentation](https://pkg.go.dev/html/template)

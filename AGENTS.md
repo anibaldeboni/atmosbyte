@@ -7,7 +7,7 @@ It is based on the current Go, Makefile, npm, and lint configuration.
 
 - Primary language: Go (`go 1.25.0` in `go.mod`).
 - Entry point: `main.go`.
-- Main packages: `bme280`, `config`, `queue`, `repository`, `web`, `openweather`.
+- Main packages: `bme280`, `config`, `queue`, `repository`, `web`, `weather`.
 - Build orchestration: `Makefile`.
 - Template minification tooling: npm scripts in `package.json`.
 - Go lint config: `.golangci.yml`.
@@ -143,7 +143,7 @@ It is based on the current Go, Makefile, npm, and lint configuration.
 
 - Config is loaded through `config.Load(...)` with defaults fallback.
 - Preserve current config file discovery behavior unless intentionally changing it.
-- Do not hardcode secrets (for example, OpenWeather AppID).
+- Do not hardcode secrets.
 - Keep defaults conservative and production-safe.
 
 ## Agent Workflow Recommendations

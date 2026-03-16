@@ -13,7 +13,6 @@ import (
 
 	"github.com/anibaldeboni/zero-paper/atmosbyte/bme280"
 	"github.com/anibaldeboni/zero-paper/atmosbyte/config"
-	"github.com/anibaldeboni/zero-paper/atmosbyte/openweather"
 	"github.com/anibaldeboni/zero-paper/atmosbyte/queue"
 	"github.com/anibaldeboni/zero-paper/atmosbyte/repository"
 	"github.com/anibaldeboni/zero-paper/atmosbyte/web"
@@ -99,23 +98,6 @@ func main() {
 	log.Printf("Starting Atmosbyte %s %s %s", buildInfo.Version, buildInfo.Date, buildInfo.GoVersion)
 	log.Printf("Configuration loaded successfully")
 
-	// Configuração da API OpenWeather
-	appID := cfg.OpenWeather.AppID
-	if appID == "" {
-		log.Fatal("OpenWeather AppID configuration is required")
-	}
-
-	stationID := cfg.OpenWeather.StationID
-	if stationID == "" {
-		log.Fatal("OpenWeather StationID configuration is required")
-	}
-
-	// Cria o cliente OpenWeather com timeout configurado
-	client, err := openweather.NewOpenWeatherClient(appID, openweather.WithTimeout(cfg.OpenWeather.Timeout))
-	if err != nil {
-		log.Fatal("Failed to create OpenWeather client:", err)
-	}
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -125,7 +107,7 @@ func main() {
 	}
 	defer repo.Close()
 
-	worker := NewOpenWeatherWorker(client, repo, stationID)
+	worker := NewRepositoryWorker(repo)
 
 	q := queue.NewQueue(ctx, worker, cfg.QueueConfig())
 

@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/anibaldeboni/zero-paper/atmosbyte/bme280"
-	"github.com/anibaldeboni/zero-paper/atmosbyte/openweather"
 	"github.com/anibaldeboni/zero-paper/atmosbyte/repository"
 )
 
@@ -28,10 +27,6 @@ type Server struct {
 	ctx             context.Context
 	systemStartTime time.Time
 	repository      MeasurementRepository
-}
-
-type MeasurementProvider interface {
-	GetMeasurement(ctx context.Context, opts openweather.GetMeasurementOptions) (*[]openweather.MeasurementResponse, error)
 }
 
 type MeasurementRepository interface {

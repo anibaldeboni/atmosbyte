@@ -24,9 +24,6 @@ type AppConfig struct {
 	// Sensor configuration
 	Sensor SensorConfig `yaml:"sensor"`
 
-	// OpenWeather API configuration
-	OpenWeather OpenWeatherConfig `yaml:"openweather"`
-
 	// Timeouts and shutdown configuration
 	Timeouts TimeoutConfig `yaml:"timeouts"`
 }
@@ -81,13 +78,6 @@ type SimConfig struct {
 	MaxHumidity    float64 `yaml:"max_humidity"`
 	MinPressure    int64   `yaml:"min_pressure"`
 	MaxPressure    int64   `yaml:"max_pressure"`
-}
-
-// OpenWeatherConfig contains OpenWeather API configuration
-type OpenWeatherConfig struct {
-	Timeout   time.Duration `yaml:"timeout"`
-	AppID     string        `yaml:"app_id"`
-	StationID string        `yaml:"station_id"`
 }
 
 // TimeoutConfig contains various timeout configurations
@@ -261,11 +251,6 @@ func applyDefaults(config *AppConfig) {
 		config.Sensor.Simulation.MaxHumidity = 80.0
 		config.Sensor.Simulation.MinPressure = 98000
 		config.Sensor.Simulation.MaxPressure = 102000
-	}
-
-	// OpenWeather defaults
-	if config.OpenWeather.Timeout == 0 {
-		config.OpenWeather.Timeout = 30 * time.Second
 	}
 
 	// Timeout defaults

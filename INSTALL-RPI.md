@@ -67,10 +67,6 @@ web:
   
 database:
   path: "/opt/atmosbyte/data.db"
-  
-openweather:
-  api_key: "your_api_key_here"
-  station_id: "your_station_id"
 ```
 
 **Installation details:**

@@ -12,8 +12,3 @@ sensor:
 
 timeouts:
   shutdown_timeout: 3s
-
-openweather:
-  app_id: "your_openweather_app_id"
-  station_id: "your_openweather_station_id"
-  timeout: 5s
