@@ -113,6 +113,9 @@ It is based on the current Go, Makefile, npm, and lint configuration.
 - Use typed config structs rather than untyped maps.
 - Keep zero-value behavior sensible where practical.
 
+## Frontend development
+- Should rely on skills `frontend-design` `ui-uix-pro-max` and `web-design-guidelines`
+
 ## Error Handling Guidelines
 
 - Return errors instead of panicking, except for unrecoverable programmer/configuration issues already following repo patterns.
