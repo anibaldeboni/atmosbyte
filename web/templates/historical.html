@@ -1,133 +1,142 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Historico meteorologico - Atmosbyte</title>
-    <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="0.9em" font-size="90">🌤️</text></svg>' />
-    <link rel="stylesheet" href="/static/css/base.css" />
-    <link rel="stylesheet" href="/static/css/layout.css" />
-    <link rel="stylesheet" href="/static/css/historical.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.min.js"></script>
-  </head>
-  <body>
-    <div class="app-shell">
-      <header class="top-nav">
-        <div class="top-nav-inner">
-          <div class="brand">
-            <span class="brand-mark" aria-hidden="true">☀️</span>
-            <div>
-              <div class="brand-title">Atmosbyte</div>
-              <div class="brand-subtitle">Comprehensive historical meteorological data</div>
-            </div>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Histórico meteorológico - Atmosbyte</title>
+  <link rel="icon" type="image/svg+xml"
+    href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="0.9em" font-size="90">🌤️</text></svg>' />
+  <link rel="stylesheet" href="/static/css/base.css" />
+  <link rel="stylesheet" href="/static/css/layout.css" />
+  <link rel="stylesheet" href="/static/css/historical.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.min.js"></script>
+</head>
+
+<body>
+  <div class="app-shell">
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">☀️</span>
+          <div>
+            <div class="brand-title">Atmosbyte</div>
+            <div class="brand-subtitle">Comprehensive historical meteorological data</div>
           </div>
-          <nav class="nav-links" aria-label="Principal">
-            <a class="nav-link" href="/">Inicio</a>
-            <a class="nav-link active" href="/historical" aria-current="page">Historico</a>
-          </nav>
         </div>
+        <nav class="nav-links" aria-label="Principal">
+          <a class="nav-link" href="/">Inicio</a>
+          <a class="nav-link active" href="/historical" aria-current="page">Historico</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="status-strip">
+      <div class="status-strip-inner">
+        <div class="status-pill"><span class="status-dot status-ok"></span><span id="status-system">Sistema
+            operacional</span></div>
+        <div class="status-pill"><span class="status-dot status-ok"></span><span id="status-sensor">Sensor BME280
+            conectado</span></div>
+        <div class="status-pill"><span class="status-dot status-ok"></span><span id="status-updated">Ultima atualizacao:
+            --</span></div>
+        <div class="status-pill"><span class="status-dot status-ok"></span><span id="status-queue">Fila de
+            processamento: --</span></div>
+      </div>
+    </section>
+
+    <main class="content-wrap">
+      <header class="historical-header">
+        <h1 class="historical-title">Weather History Analysis</h1>
+        <p class="historical-subtitle">Visualização de dados meteorológicos históricos</p>
       </header>
 
-      <section class="status-strip">
-        <div class="status-strip-inner">
-          <div class="status-pill"><span class="status-dot status-ok"></span><span id="status-system">Sistema operacional</span></div>
-          <div class="status-pill"><span class="status-dot status-ok"></span><span id="status-sensor">Sensor BME280 conectado</span></div>
-          <div class="status-pill"><span class="status-dot status-ok"></span><span id="status-updated">Ultima atualizacao: --</span></div>
-          <div class="status-pill"><span class="status-dot status-ok"></span><span id="status-queue">Fila de processamento: --</span></div>
-        </div>
+      <div id="historical-alert"></div>
+
+      <section class="card filters-card" aria-label="Filtros históricos">
+        <form id="filters-form" class="filters-grid">
+          <div>
+            <label class="label" for="aggregation-type">Agregação</label>
+            <select class="select" id="aggregation-type" name="type">
+              <option value="m">Minuto</option>
+              <option value="h" selected>Hora</option>
+              <option value="d">Dia</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="label" for="from-date">Data inicial</label>
+            <input class="input" type="datetime-local" id="from-date" name="from" required />
+          </div>
+
+          <div>
+            <label class="label" for="to-date">Data final</label>
+            <input class="input" type="datetime-local" id="to-date" name="to" required />
+          </div>
+
+          <div class="actions-cell" style="display: flex; gap: 10px; align-items: end;">
+            <button type="submit" class="btn btn-primary" id="load-data">Carregar dados</button>
+            <button type="button" class="btn btn-secondary" id="export-csv">Exportar CSV</button>
+          </div>
+        </form>
       </section>
 
-      <main class="content-wrap">
-        <header class="historical-header">
-          <h1 class="historical-title">Weather History Analysis</h1>
-          <p class="historical-subtitle">Visualizacao de dados meteorologicos historicos</p>
-        </header>
+      <section id="empty-state" class="empty-state" hidden>Nenhum dado encontrado para o período selecionado.</section>
 
-        <div id="historical-alert"></div>
-
-        <section class="card filters-card" aria-label="Filtros historicos">
-          <form id="filters-form" class="filters-grid">
+      <div id="charts-container" class="charts-stack">
+        <article class="card chart-card">
+          <div class="chart-top">
             <div>
-              <label class="label" for="aggregation-type">Agregacao</label>
-              <select class="select" id="aggregation-type" name="type">
-                <option value="m">Minuto</option>
-                <option value="h" selected>Hora</option>
-                <option value="d">Dia</option>
-              </select>
+              <h2 class="chart-title">Temperatura do Ar (°C)</h2>
+              <p class="chart-subtitle">Variação térmica no período selecionado</p>
             </div>
+            <div class="legend-inline" aria-label="Legenda temperatura">
+              <span class="legend-item"><span class="legend-dot dot-max"></span>MAX</span>
+              <span class="legend-item"><span class="legend-dot dot-avg"></span>AVG</span>
+              <span class="legend-item"><span class="legend-dot dot-min"></span>MIN</span>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="temperature-chart"></canvas></div>
+        </article>
 
+        <article class="card chart-card">
+          <div class="chart-top">
             <div>
-              <label class="label" for="from-date">Data inicial</label>
-              <input class="input" type="datetime-local" id="from-date" name="from" required />
+              <h2 class="chart-title">Umidade Relativa (%)</h2>
+              <p class="chart-subtitle">Oscilação da umidade do ar por período</p>
             </div>
+            <div class="legend-inline" aria-label="Legenda umidade">
+              <span class="legend-item"><span class="legend-dot dot-max"></span>MAX</span>
+              <span class="legend-item"><span class="legend-dot dot-avg"></span>AVG</span>
+              <span class="legend-item"><span class="legend-dot dot-min"></span>MIN</span>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="humidity-chart"></canvas></div>
+        </article>
 
+        <article class="card chart-card">
+          <div class="chart-top">
             <div>
-              <label class="label" for="to-date">Data final</label>
-              <input class="input" type="datetime-local" id="to-date" name="to" required />
+              <h2 class="chart-title">Pressão Atmosférica (hPa)</h2>
+              <p class="chart-subtitle">Monitoramento da pressão barométrica</p>
             </div>
-
-            <div class="actions-cell" style="display: flex; gap: 10px; align-items: end;">
-              <button type="submit" class="btn btn-primary" id="load-data">Carregar Dados</button>
-              <button type="button" class="btn btn-secondary" id="export-csv">Exportar CSV</button>
+            <div class="legend-inline" aria-label="Legenda pressão">
+              <span class="legend-item"><span class="legend-dot dot-max"></span>MAX</span>
+              <span class="legend-item"><span class="legend-dot dot-avg"></span>AVG</span>
+              <span class="legend-item"><span class="legend-dot dot-min"></span>MIN</span>
             </div>
-          </form>
-        </section>
+          </div>
+          <div class="chart-wrap"><canvas id="pressure-chart"></canvas></div>
+        </article>
+      </div>
+    </main>
 
-        <section id="empty-state" class="empty-state" hidden>Nenhum dado encontrado para o periodo selecionado.</section>
+    <footer class="page-footer">© 2026 Atmosbyte Environmental Monitoring Solutions. Todos os direitos reservados.
+    </footer>
+  </div>
 
-        <div id="charts-container" class="charts-stack">
-          <article class="card chart-card">
-            <div class="chart-top">
-              <div>
-                <h2 class="chart-title">Historico da Temperatura do Ar (°C)</h2>
-                <p class="chart-subtitle">Variacao termica no periodo selecionado</p>
-              </div>
-              <div class="legend-inline" aria-label="Legenda temperatura">
-                <span class="legend-item"><span class="legend-dot dot-max"></span>MAX</span>
-                <span class="legend-item"><span class="legend-dot dot-avg"></span>AVG</span>
-                <span class="legend-item"><span class="legend-dot dot-min"></span>MIN</span>
-              </div>
-            </div>
-            <div class="chart-wrap"><canvas id="temperature-chart"></canvas></div>
-          </article>
+  <script type="module" src="/static/js/historical.js"></script>
+</body>
 
-          <article class="card chart-card">
-            <div class="chart-top">
-              <div>
-                <h2 class="chart-title">Historico da Umidade Relativa (%)</h2>
-                <p class="chart-subtitle">Oscilacao da umidade do ar por periodo</p>
-              </div>
-              <div class="legend-inline" aria-label="Legenda umidade">
-                <span class="legend-item"><span class="legend-dot dot-max"></span>MAX</span>
-                <span class="legend-item"><span class="legend-dot dot-avg"></span>AVG</span>
-                <span class="legend-item"><span class="legend-dot dot-min"></span>MIN</span>
-              </div>
-            </div>
-            <div class="chart-wrap"><canvas id="humidity-chart"></canvas></div>
-          </article>
-
-          <article class="card chart-card">
-            <div class="chart-top">
-              <div>
-                <h2 class="chart-title">Historico da Pressao Atmosferica (hPa)</h2>
-                <p class="chart-subtitle">Monitoramento da pressao barometrica</p>
-              </div>
-              <div class="legend-inline" aria-label="Legenda pressao">
-                <span class="legend-item"><span class="legend-dot dot-max"></span>MAX</span>
-                <span class="legend-item"><span class="legend-dot dot-avg"></span>AVG</span>
-                <span class="legend-item"><span class="legend-dot dot-min"></span>MIN</span>
-              </div>
-            </div>
-            <div class="chart-wrap"><canvas id="pressure-chart"></canvas></div>
-          </article>
-        </div>
-      </main>
-
-      <footer class="page-footer">© 2026 Atmosbyte Environmental Monitoring Solutions. Todos os direitos reservados.</footer>
-    </div>
-
-    <script type="module" src="/static/js/historical.js"></script>
-  </body>
 </html>
