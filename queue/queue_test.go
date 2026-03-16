@@ -986,24 +986,24 @@ func TestGracefulShutdown_NoNewMessages(t *testing.T) {
 }
 
 func TestGracefulShutdown_RetryBehavior(t *testing.T) {
-	retryCount := 0
+	var retryCount int32
 	worker := &MockWorker{
 		processFunc: func(ctx context.Context, msg OrderData) error {
-			retryCount++
+			count := atomic.AddInt32(&retryCount, 1)
 
 			// Verifica se estamos em shutdown
 			if ctx.Err() != nil {
-				t.Logf("Processing message %s during shutdown (attempt %d)", msg.ID, retryCount)
+				t.Logf("Processing message %s during shutdown (attempt %d)", msg.ID, count)
 
 				// Durante shutdown, falha apenas uma vez para testar retry limitado
-				if retryCount == 1 {
+				if count == 1 {
 					return NewHTTPError(500, "Temporary error during shutdown")
 				}
 				return nil
 			}
 
 			// Comportamento normal
-			if retryCount < 2 {
+			if count < 2 {
 				return NewHTTPError(500, "Temporary error")
 			}
 			return nil
@@ -1040,12 +1040,14 @@ func TestGracefulShutdown_RetryBehavior(t *testing.T) {
 	// Aguarda processamento durante shutdown
 	time.Sleep(200 * time.Millisecond)
 
+	finalRetryCount := atomic.LoadInt32(&retryCount)
+
 	// Verifica quantas tentativas foram feitas
-	t.Logf("Total retry attempts during shutdown: %d", retryCount)
+	t.Logf("Total retry attempts during shutdown: %d", finalRetryCount)
 
 	// Durante shutdown, deve ter limitado os retries
-	if retryCount > 2 {
-		t.Errorf("Expected at most 2 attempts during shutdown, got %d", retryCount)
+	if finalRetryCount > 2 {
+		t.Errorf("Expected at most 2 attempts during shutdown, got %d", finalRetryCount)
 	}
 
 	calls := worker.GetCalls()
@@ -1182,8 +1184,7 @@ func TestQueue_StartMethod(t *testing.T) {
 	start := time.Now()
 	cancel()
 	err := <-done
-
-	duration := time.Since(start)
+	t.Logf("Start() returned after %v", time.Since(start))
 
 	if err != context.Canceled {
 		t.Errorf("Expected context.Canceled, got %v", err)
@@ -1196,7 +1197,8 @@ func TestQueue_StartMethod(t *testing.T) {
 		t.Error("Expected at least some messages to be processed")
 	}
 
-	if duration < 10*time.Millisecond {
-		t.Errorf("Start() completed too quickly (%v), might not have waited for shutdown", duration)
+	err = q.Enqueue("after_cancel")
+	if err != queue.ErrQueueClosed {
+		t.Errorf("Expected ErrQueueClosed after cancel, got %v", err)
 	}
 }
