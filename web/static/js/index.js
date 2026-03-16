@@ -5,17 +5,12 @@ import {
   showInlineAlert,
   withOneRetry,
 } from "/static/js/common.js"
+import { createStatusStrip } from "/static/js/status-strip.js"
 
 let pollingTimer = null
 let pollingDelay = 30000
 let failedCycles = 0
-
-function updateIndicator(dotId, textId, dotClass, text) {
-  const dot = document.getElementById(dotId)
-  dot.classList.remove("status-ok", "status-warn", "status-error")
-  dot.classList.add(dotClass)
-  document.getElementById(textId).textContent = text
-}
+let statusStrip = null
 
 function updateMeasurements(measurements) {
   document.getElementById("temp-value").textContent = measurements.temperature.toFixed(1)
@@ -25,45 +20,43 @@ function updateMeasurements(measurements) {
 }
 
 function setDegradedMode(enabled) {
+  if (!statusStrip) {
+    return
+  }
+
   if (enabled) {
     showInlineAlert("index-alert", "error", "Conexao instavel. Atualizacao em modo degradado (60s).")
     pollingDelay = 60000
-    updateIndicator("system-dot", "system-status", "status-warn", "Sistema com degradacao")
+    statusStrip.setSystemOverride({ level: "warn", message: "Sistema com degradacao" })
     return
   }
 
   showInlineAlert("index-alert", "success", "Atualizacao restabelecida")
   pollingDelay = 30000
-  updateIndicator("system-dot", "system-status", "status-ok", "Sistema operacional")
+  statusStrip.setSystemOverride(null)
 }
 
 async function fetchCycle() {
-  const [mRes, hRes, qRes] = await Promise.allSettled([
+  const [mRes, sRes] = await Promise.allSettled([
     withOneRetry(() => fetchJSON("/measurements")),
-    withOneRetry(() => fetchJSON("/health")),
-    withOneRetry(() => fetchJSON("/queue")),
+    statusStrip.refresh(),
   ])
 
   if (mRes.status === "fulfilled") {
     updateMeasurements(mRes.value)
   }
 
-  if (hRes.status === "fulfilled") {
-    const sensor = hRes.value.sensor
-    if (sensor === "connected") {
-      updateIndicator("sensor-dot", "sensor-status", "status-ok", "Sensor BME280 conectado")
-    } else {
-      updateIndicator("sensor-dot", "sensor-status", "status-error", "Sensor indisponivel")
-    }
+  let statusFailed = sRes.status === "rejected"
+  if (sRes.status === "fulfilled") {
+    const failures = sRes.value.failures
+    statusFailed =
+      failures.health ||
+      failures.queue ||
+      failures.invalidPayloadHealth ||
+      failures.invalidPayloadQueue
   }
 
-  if (qRes.status === "fulfilled") {
-    const stateNames = { 0: "Fechado", 1: "Aberto", 2: "Meio-aberto" }
-    document.getElementById("queue-status").textContent = `Fila: ${qRes.value.queue_size} itens (${stateNames[qRes.value.circuit_breaker_state] || "Desconhecido"})`
-    updateIndicator("queue-dot", "queue-status", "status-ok", document.getElementById("queue-status").textContent)
-  }
-
-  const hasFailure = [mRes, hRes, qRes].some((item) => item.status === "rejected")
+  const hasFailure = mRes.status === "rejected" || statusFailed
   if (hasFailure) {
     failedCycles += 1
     if (failedCycles >= 3) {
@@ -126,6 +119,15 @@ function setupTechDetailsToggle() {
 }
 
 export function initIndexPage() {
+  statusStrip = createStatusStrip({
+    systemDotId: "system-dot",
+    systemTextId: "system-status",
+    sensorDotId: "sensor-dot",
+    sensorTextId: "sensor-status",
+    queueDotId: "queue-dot",
+    queueTextId: "queue-status",
+  })
+
   setupTechDetailsToggle()
   document.getElementById("refresh-btn").addEventListener("click", () => {
     refreshRealtimeData()

@@ -311,7 +311,7 @@ func TestHandleRoot_HTML(t *testing.T) {
 		t.Error("Expected HTML body to contain 'Atmosbyte'")
 	}
 
-	if !strings.Contains(body, "monitoramento meteorologico") {
+	if !strings.Contains(body, "monitoramento meteorologico") && !strings.Contains(body, "monitoramento meteorológico") {
 		t.Error("Expected HTML body to contain weather monitoring text")
 	}
 }
