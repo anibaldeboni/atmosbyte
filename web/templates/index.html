@@ -5,6 +5,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tempo atual - Atmosbyte</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
   <link rel="icon" type="image/svg+xml"
     href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="0.9em" font-size="90">🌤️</text></svg>' />
   <link rel="stylesheet" href="/static/css/base.css" />
@@ -17,7 +22,13 @@
     <header class="top-nav">
       <div class="top-nav-inner">
         <div class="brand">
-          <span class="brand-mark" aria-hidden="true">☀️</span>
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" role="img">
+              <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8" />
+              <path d="M12 2.5v2.2M12 19.3v2.2M4.7 4.7l1.6 1.6M17.7 17.7l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.7 19.3l1.6-1.6M17.7 6.3l1.6-1.6"
+                stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </span>
           <div>
             <div class="brand-title">Atmosbyte</div>
             <div class="brand-subtitle">Sistema de monitoramento meteorológico em tempo real</div>
@@ -53,19 +64,44 @@
 
       <section class="metrics-grid" id="metrics-grid">
         <article class="card metric-card">
-          <div class="metric-head"><span>Temperatura do ar</span><span>🌡️</span></div>
+          <div class="metric-head">
+            <span>Temperatura do ar</span>
+            <span class="metric-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" role="img">
+                <path d="M14 14.76V5a2 2 0 1 0-4 0v9.76a4 4 0 1 0 4 0Z" stroke="currentColor" stroke-width="1.8"
+                  stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M12 11v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+            </span>
+          </div>
           <div class="metric-value"><span id="temp-value">--</span><span class="metric-unit">°C</span></div>
           <div class="metric-caption">Temperatura atual medida pelo sensor</div>
         </article>
 
         <article class="card metric-card">
-          <div class="metric-head"><span>Umidade relativa</span><span>💧</span></div>
+          <div class="metric-head">
+            <span>Umidade relativa</span>
+            <span class="metric-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" role="img">
+                <path d="M12 3.5C9 7.5 6 10.2 6 14a6 6 0 1 0 12 0c0-3.8-3-6.5-6-10.5Z" stroke="currentColor"
+                  stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+          </div>
           <div class="metric-value"><span id="humidity-value">--</span><span class="metric-unit">%</span></div>
           <div class="metric-caption">Percentual de umidade do ar</div>
         </article>
 
         <article class="card metric-card">
-          <div class="metric-head"><span>Pressão atmosférica</span><span>📊</span></div>
+          <div class="metric-head">
+            <span>Pressão atmosférica</span>
+            <span class="metric-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" role="img">
+                <path d="M5 15h3M10.5 12h3M16 9h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                <path d="M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+            </span>
+          </div>
           <div class="metric-value"><span id="pressure-value">--</span><span class="metric-unit">hPa</span></div>
           <div class="metric-caption">Pressão atmosférica convertida em hPa</div>
         </article>

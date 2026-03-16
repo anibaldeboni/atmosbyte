@@ -30,7 +30,7 @@ body {
 }
 
 body {
-  font-family: "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Manrope", "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
   background: var(--bg);
   color: var(--text-strong);
 }

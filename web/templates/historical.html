@@ -5,6 +5,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Histórico meteorológico - Atmosbyte</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
   <link rel="icon" type="image/svg+xml"
     href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="0.9em" font-size="90">🌤️</text></svg>' />
   <link rel="stylesheet" href="/static/css/base.css" />
@@ -20,15 +25,21 @@
     <header class="top-nav">
       <div class="top-nav-inner">
         <div class="brand">
-          <span class="brand-mark" aria-hidden="true">☀️</span>
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" role="img">
+              <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8" />
+              <path d="M12 2.5v2.2M12 19.3v2.2M4.7 4.7l1.6 1.6M17.7 17.7l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.7 19.3l1.6-1.6M17.7 6.3l1.6-1.6"
+                stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </span>
           <div>
             <div class="brand-title">Atmosbyte</div>
             <div class="brand-subtitle">Comprehensive historical meteorological data</div>
           </div>
         </div>
         <nav class="nav-links" aria-label="Principal">
-          <a class="nav-link" href="/">Inicio</a>
-          <a class="nav-link active" href="/historical" aria-current="page">Historico</a>
+          <a class="nav-link" href="/">Início</a>
+          <a class="nav-link active" href="/historical" aria-current="page">Histórico</a>
         </nav>
       </div>
     </header>
