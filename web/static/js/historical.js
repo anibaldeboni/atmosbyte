@@ -5,11 +5,13 @@ import {
   showInlineAlert,
   toRFC3339Local,
 } from "/static/js/common.js"
+import { createStatusStrip } from "/static/js/status-strip.js"
 
 let temperatureChart = null
 let humidityChart = null
 let pressureChart = null
 let exportInFlight = false
+let statusStrip = null
 
 function withDefaultFilters() {
   const now = new Date()
@@ -45,39 +47,10 @@ function validateFilters(filters) {
   }
 }
 
-function setPageStatus(message, kindClass = "status-ok") {
+function setHistoricalLastUpdate(message) {
   const updatedEl = document.getElementById("status-updated")
-  const systemDot = updatedEl?.closest(".status-pill")?.querySelector(".status-dot")
   if (updatedEl) {
     updatedEl.textContent = message
-  }
-  if (systemDot) {
-    systemDot.classList.remove("status-ok", "status-warn", "status-error")
-    systemDot.classList.add(kindClass)
-  }
-}
-
-async function refreshTopStatus() {
-  const [healthRes, queueRes] = await Promise.allSettled([
-    fetchJSON("/health"),
-    fetchJSON("/queue"),
-  ])
-
-  const sensorText = document.getElementById("status-sensor")
-  const queueText = document.getElementById("status-queue")
-
-  if (healthRes.status === "fulfilled") {
-    const sensor = healthRes.value?.sensor || "error"
-    sensorText.textContent =
-      sensor === "connected" ? "Sensor BME280 conectado" : "Sensor indisponivel"
-  } else {
-    sensorText.textContent = "Sensor indisponivel"
-  }
-
-  if (queueRes.status === "fulfilled") {
-    queueText.textContent = `Fila de processamento: ${queueRes.value.queue_size ?? "--"} itens`
-  } else {
-    queueText.textContent = "Fila de processamento: indisponivel"
   }
 }
 
@@ -250,10 +223,10 @@ async function runLoadCycle() {
     setEmptyState(false)
     renderHistoricalCharts(data)
     showInlineAlert("historical-alert", "success", "Dados carregados com sucesso")
-    setPageStatus(`Ultima atualizacao: ${formatLocalDateTime(new Date())}`)
+    setHistoricalLastUpdate(`Ultima atualizacao: ${formatLocalDateTime(new Date())}`)
   } catch (error) {
     showInlineAlert("historical-alert", "error", `Falha ao carregar dados: ${error.message}`)
-    setPageStatus("Ultima atualizacao: falha", "status-warn")
+    setHistoricalLastUpdate("Ultima atualizacao: falha")
   } finally {
     loadButton.disabled = false
     loadButton.textContent = "Carregar Dados"
@@ -262,6 +235,15 @@ async function runLoadCycle() {
 }
 
 export function initHistoricalPage() {
+  statusStrip = createStatusStrip({
+    systemDotId: "status-system-dot",
+    systemTextId: "status-system",
+    sensorDotId: "status-sensor-dot",
+    sensorTextId: "status-sensor",
+    queueDotId: "status-queue-dot",
+    queueTextId: "status-queue",
+  })
+
   withDefaultFilters()
   document.getElementById("filters-form").addEventListener("submit", (event) => {
     event.preventDefault()
@@ -277,8 +259,10 @@ export function initHistoricalPage() {
   })
 
   runLoadCycle()
-  refreshTopStatus()
-  setInterval(refreshTopStatus, 30000)
+  statusStrip.refresh()
+  setInterval(() => {
+    statusStrip.refresh()
+  }, 30000)
 }
 
 document.addEventListener("DOMContentLoaded", initHistoricalPage)
