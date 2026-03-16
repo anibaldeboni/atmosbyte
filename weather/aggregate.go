@@ -45,6 +45,8 @@ type Temperature struct {
 }
 
 type Humidity struct {
+	Min     *float64 `json:"min,omitempty"`
+	Max     *float64 `json:"max,omitempty"`
 	Average *float64 `json:"average,omitempty"`
 }
 
@@ -122,7 +124,7 @@ func roundToDecimal(value float64, places int) float64 {
 func calculateAggregates(measurements []repository.MeasurementRecord, date int64, kind AggregationKind) AggregateMeasurement {
 	var (
 		tempSum, tempMin, tempMax float64
-		humSum                    float64
+		humSum, humMin, humMax    float64
 		pressSum                  float64
 		pressMin, pressMax        int64
 		count                     int64
@@ -130,6 +132,8 @@ func calculateAggregates(measurements []repository.MeasurementRecord, date int64
 
 	tempMin = measurements[0].Temperature
 	tempMax = measurements[0].Temperature
+	humMin = measurements[0].Humidity
+	humMax = measurements[0].Humidity
 	pressMin = measurements[0].Pressure
 	pressMax = measurements[0].Pressure
 
@@ -145,6 +149,13 @@ func calculateAggregates(measurements []repository.MeasurementRecord, date int64
 			tempMax = m.Temperature
 		}
 
+		if m.Humidity < humMin {
+			humMin = m.Humidity
+		}
+		if m.Humidity > humMax {
+			humMax = m.Humidity
+		}
+
 		if m.Pressure < pressMin {
 			pressMin = m.Pressure
 		}
@@ -158,6 +169,8 @@ func calculateAggregates(measurements []repository.MeasurementRecord, date int64
 	tempMax = roundToDecimal(tempMax, 1)
 	tempMin = roundToDecimal(tempMin, 1)
 	tempAvg := roundToDecimal(tempSum/float64(count), 1)
+	humMin = roundToDecimal(humMin, 1)
+	humMax = roundToDecimal(humMax, 1)
 	humAvg := roundToDecimal(humSum/float64(count), 1)
 	pressAvg := roundToDecimal(pressSum/float64(count), 1)
 
@@ -170,6 +183,8 @@ func calculateAggregates(measurements []repository.MeasurementRecord, date int64
 			Average: &tempAvg,
 		},
 		Humidity: Humidity{
+			Min:     &humMin,
+			Max:     &humMax,
 			Average: &humAvg,
 		},
 		Pressure: Pressure{

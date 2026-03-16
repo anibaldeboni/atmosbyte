@@ -77,6 +77,7 @@ func NewServer(ctx context.Context, sensor bme280.Reader, config *Config, queue 
 			"/queue":        "Status da fila de processamento (JSON)",
 			"/historical":   "Dados históricos do tempo",
 			"/data":         "API para dados históricos do tempo (JSON)",
+			"/data/export":  "Exportar dados históricos (CSV)",
 		},
 		repository: repo,
 	}
@@ -97,11 +98,13 @@ func NewServer(ctx context.Context, sensor bme280.Reader, config *Config, queue 
 
 // setupRoutes configures all HTTP routes
 func (s *Server) setupRoutes(mux *http.ServeMux) {
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(staticFileSystem())))
 	mux.HandleFunc("/measurements", s.handleMeasurements)
 	mux.HandleFunc("/health", s.handleHealth)
 	mux.HandleFunc("/queue", s.handleQueue)
 	mux.HandleFunc("/historical", s.handleHistoricalWeather)
 	mux.HandleFunc("/data", s.handleHistoricalWeatherAPI)
+	mux.HandleFunc("/data/export", s.handleHistoricalWeatherCSV)
 	mux.HandleFunc("GET /{$}", s.handleRoot)
 	mux.HandleFunc("/", s.handleNotFound)
 }

@@ -1,0 +1,113 @@
+.index-header {
+  margin-bottom: 18px;
+}
+
+.index-title {
+  margin: 0;
+  font-size: 42px;
+  letter-spacing: -0.02em;
+}
+
+.index-subtitle {
+  margin-top: 6px;
+  color: #667085;
+  font-size: 18px;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.metric-card {
+  padding: 20px;
+}
+
+.metric-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #475467;
+  font-weight: 600;
+}
+
+.metric-value {
+  margin-top: 8px;
+  font-size: 56px;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+}
+
+.metric-unit {
+  font-size: 24px;
+  color: #667085;
+  margin-left: 4px;
+}
+
+.metric-caption {
+  margin-top: 8px;
+  color: #667085;
+}
+
+.index-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 18px;
+}
+
+.tech-details {
+  padding: 16px;
+}
+
+.toggle-btn {
+  background: transparent;
+  border: none;
+  color: #344054;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.routes-list {
+  margin: 12px 0 0;
+  list-style: none;
+  padding: 0;
+}
+
+.route-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #e4e7ec;
+}
+
+.route-item:last-child {
+  border-bottom: none;
+}
+
+.route-path {
+  font-family: "Courier New", monospace;
+  color: #0f7431;
+  font-weight: 700;
+}
+
+.route-desc {
+  color: #667085;
+}
+
+@media (max-width: 920px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-value {
+    font-size: 44px;
+  }
+
+  .index-title {
+    font-size: 34px;
+  }
+}

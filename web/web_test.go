@@ -55,6 +55,14 @@ type MockMeasurementRepository struct {
 }
 
 func (m *MockMeasurementRepository) GetMeasurementsByTimeRange(startTime, endTime time.Time) ([]repository.MeasurementRecord, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
+
+	if m.data != nil {
+		return m.data, nil
+	}
+
 	measurement := []repository.MeasurementRecord{{
 		ID:          1,
 		Timestamp:   time.Now(),
@@ -63,7 +71,7 @@ func (m *MockMeasurementRepository) GetMeasurementsByTimeRange(startTime, endTim
 		Pressure:    101325,
 	}}
 
-	return measurement, m.err
+	return measurement, nil
 }
 
 var queueProvider = &MockQueueStatsProvider{
@@ -114,7 +122,7 @@ func TestGetRoutes(t *testing.T) {
 
 	routes := server.GetRoutes()
 
-	expectedRoutes := []string{"/", "/health", "/measurements", "/queue", "/data", "/historical"}
+	expectedRoutes := []string{"/", "/health", "/measurements", "/queue", "/data", "/data/export", "/historical"}
 
 	for _, route := range expectedRoutes {
 		if _, exists := routes[route]; !exists {
@@ -303,8 +311,27 @@ func TestHandleRoot_HTML(t *testing.T) {
 		t.Error("Expected HTML body to contain 'Atmosbyte'")
 	}
 
-	if !strings.Contains(body, "Monitoramento Meteorológico") {
+	if !strings.Contains(body, "monitoramento meteorologico") {
 		t.Error("Expected HTML body to contain weather monitoring text")
+	}
+}
+
+func TestServerServesStaticAssets(t *testing.T) {
+	sensor := &MockSensorProvider{}
+	measurementProvider := &MockMeasurementRepository{}
+	server := NewServer(t.Context(), sensor, testConfig(), queueProvider, measurementProvider)
+
+	req := httptest.NewRequest(http.MethodGet, "/static/css/base.css", nil)
+	w := httptest.NewRecorder()
+
+	server.server.Handler.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("Expected status 200, got %d", w.Code)
+	}
+
+	if !strings.Contains(w.Header().Get("Content-Type"), "text/css") {
+		t.Fatalf("Expected CSS content type, got %s", w.Header().Get("Content-Type"))
 	}
 }
 
