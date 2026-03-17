@@ -5,6 +5,7 @@ bin/
 dist/
 atmosbyte.yaml
 *Zone.identifier
+weather.db
 
 # Build artifacts
 web/templates-min/
