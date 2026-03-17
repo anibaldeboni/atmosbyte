@@ -109,10 +109,12 @@ export function useStatusPolling(policy: PollingPolicy = DEFAULT_POLICY): Status
         }
 
         const message = unknownError instanceof ApiError ? unknownError.message : "Status request failed"
+        const communicationLevel: "warn" | "error" = degraded ? "error" : "warn"
         setError(message)
         setStatus((previous) => ({
           ...previous,
-          level: degraded ? "warn" : previous.level,
+          level: communicationLevel,
+          sensorLevel: communicationLevel,
           message: degraded ? "Status degraded due to repeated failures" : previous.message,
           isDegraded: degraded,
           updatedAt: Date.now(),

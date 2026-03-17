@@ -60,6 +60,11 @@
   --status-dot-warn: #fbbf24;
   --status-dot-error: #ef4444;
   --status-dot-info: #4ade80;
+  --status-icon-ok: #dcfce7;
+  --status-icon-warn: #fde68a;
+  --status-icon-error: #fecdd3;
+  --status-icon-clock: #ffffff;
+  --status-icon-clock-error: #ff9aa5;
   --empty-state-bg: #f8fafc;
   --empty-state-border: #cbd5e1;
   --empty-state-title: #1e293b;
@@ -136,6 +141,11 @@
   --status-dot-warn: #f1bb4f;
   --status-dot-error: #ff5964;
   --status-dot-info: #2de7dc;
+  --status-icon-ok: #9dffd9;
+  --status-icon-warn: #ffe2a3;
+  --status-icon-error: #ffb7c0;
+  --status-icon-clock: #ffffff;
+  --status-icon-clock-error: #ff9aa5;
   --empty-state-bg: #171f31;
   --empty-state-border: #3a4c6b;
   --empty-state-title: #eef4ff;
@@ -255,6 +265,38 @@ body {
 
 .status-dot-info {
   background-color: var(--status-dot-info);
+}
+
+.status-item-icon {
+  display: inline-flex;
+  height: 1.25rem;
+  width: 1.25rem;
+  flex-shrink: 0;
+}
+
+.status-item-icon svg {
+  height: 100%;
+  width: 100%;
+}
+
+.status-icon-ok {
+  color: var(--status-icon-ok);
+}
+
+.status-icon-warn {
+  color: var(--status-icon-warn);
+}
+
+.status-icon-error {
+  color: var(--status-icon-error);
+}
+
+.status-icon-clock {
+  color: var(--status-icon-clock);
+}
+
+.status-icon-clock-error {
+  color: var(--status-icon-clock-error);
 }
 
 .skeleton {

@@ -73,10 +73,16 @@ test("enters degraded backoff after three failures", async () => {
     expect(result.current.loading).toBe(false)
   })
 
+   expect(result.current.status.isDegraded).toBe(false)
+   expect(result.current.status.level).toBe("warn")
+   expect(result.current.status.sensorLevel).toBe("warn")
+
   jest.advanceTimersByTime(400)
 
   await waitFor(() => {
     expect(result.current.status.isDegraded).toBe(true)
+    expect(result.current.status.level).toBe("error")
+    expect(result.current.status.sensorLevel).toBe("error")
     expect(result.current.intervalMs).toBe(1000)
   })
 })
