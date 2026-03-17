@@ -103,6 +103,7 @@ It is based on the current Go, Makefile, npm, and lint configuration.
 - Keep exported names in PascalCase and unexported names in camelCase.
 - Package names should be short, lowercase, no underscores.
 - File names should be lowercase; use `_test.go` for tests.
+- Should use stdlib functions over custom implementations.
 
 ## Types And API Design
 
