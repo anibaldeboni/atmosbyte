@@ -4,7 +4,7 @@
   "description": "Build tools for Atmosbyte project",
   "private": true,
   "scripts": {
-    "minify": "html-minifier-terser --input-dir web/templates --output-dir web/templates-min --file-ext html --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true",
+    "minify": "html-minifier-terser --input-dir web/templates --output-dir web/templates-min --file-ext html --collapse-whitespace --remove-comments --use-short-doctype --minify-css false --minify-js false",
     "clean": "rimraf web/templates-min",
     "watch": "chokidar 'web/templates/**/*.html' -c 'npm run minify'"
   },
