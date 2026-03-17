@@ -13,9 +13,9 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "types": ["jest", "node"],
+    "types": ["jest", "node", "react", "react-dom", "@testing-library/jest-dom"],
     "baseUrl": "./src"
   },
-  "include": ["src", "vite.config.ts", "jest.config.ts", "tailwind.config.ts"],
+  "include": ["src", "vite.config.ts", "jest.config.ts", "jest.setup.ts", "tailwind.config.ts"],
   "exclude": ["dist", "node_modules"]
 }

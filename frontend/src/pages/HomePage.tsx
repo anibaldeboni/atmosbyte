@@ -5,7 +5,7 @@ import { InlineAlert } from "../shared/ui/InlineAlert"
 interface HomePageProps {
 }
 
-export function HomePage({ }: HomePageProps): JSX.Element {
+export function HomePage({ }: HomePageProps): React.JSX.Element {
   const { data, loading, error, degraded, intervalMs } = useCurrentMetrics()
 
   return (

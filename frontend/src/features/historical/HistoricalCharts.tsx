@@ -83,7 +83,7 @@ function formatBrowserDateTime(value: number): string {
   })
 }
 
-function DateHourTick(props: { x?: number; y?: number; payload?: { value: number } }): JSX.Element {
+function DateHourTick(props: { x?: number; y?: number; payload?: { value: number } }): React.JSX.Element {
   const x = props.x ?? 0
   const y = props.y ?? 0
   const value = props.payload?.value
@@ -118,7 +118,7 @@ function MetricsLineChart({
   minKey: keyof ChartPoint
   avgKey: keyof ChartPoint
   maxKey: keyof ChartPoint
-}): JSX.Element {
+}): React.JSX.Element {
   const yDomain = calculateDomain(data, [minKey, avgKey, maxKey])
 
   return (
@@ -147,7 +147,7 @@ function MetricsLineChart({
   )
 }
 
-function ChartLegend(): JSX.Element {
+function ChartLegend(): React.JSX.Element {
   return (
     <div className="historical-chart-legend flex items-center gap-4 text-[13px] font-semibold" aria-label="Legenda">
       <span className="inline-flex items-center gap-2">
@@ -166,7 +166,7 @@ function ChartLegend(): JSX.Element {
   )
 }
 
-export function HistoricalCharts({ data, loading, error }: HistoricalChartsProps): JSX.Element {
+export function HistoricalCharts({ data, loading, error }: HistoricalChartsProps): React.JSX.Element {
   if (loading && data.length === 0) {
     return (
       <div className="grid gap-4" data-testid="historical-skeletons">

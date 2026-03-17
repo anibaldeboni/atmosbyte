@@ -9,7 +9,7 @@ function linkClass(isActive: boolean): string {
     : "app-shell-nav-link whitespace-nowrap rounded-md px-2 py-2 text-sm font-bold md:px-3 md:text-[15px]"
 }
 
-export function AppShell(): JSX.Element {
+export function AppShell(): React.JSX.Element {
   const { theme, toggleTheme } = useTheme()
   const toggleLabel = theme === "light" ? "Ativar modo escuro" : "Ativar modo claro"
 

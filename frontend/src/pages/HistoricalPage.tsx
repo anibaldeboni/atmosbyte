@@ -23,7 +23,7 @@ function toIso(value: string): string {
   return new Date(value).toISOString()
 }
 
-export function HistoricalPage({ }: HistoricalPageProps): JSX.Element {
+export function HistoricalPage({ }: HistoricalPageProps): React.JSX.Element {
   const { data, loading, error, load } = useHistoricalData()
 
   const handlers = useMemo(

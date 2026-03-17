@@ -15,9 +15,11 @@ test("maps HTTP errors to ApiError with details", async () => {
     json: jest.fn().mockResolvedValue({ error: "sensor unavailable", code: 500, timestamp: "2026-03-17T00:00:00Z" }),
   } as unknown as Response)
 
-  await expect(client.getMeasurements()).rejects.toEqual(
-    expect.objectContaining<ApiError>({ kind: "http", status: 500, details: "sensor unavailable" }),
-  )
+  await expect(client.getMeasurements()).rejects.toMatchObject({
+    kind: "http",
+    status: 500,
+    details: "sensor unavailable",
+  })
 })
 
 test("maps parse failures for invalid payload", async () => {
@@ -26,17 +28,17 @@ test("maps parse failures for invalid payload", async () => {
     json: jest.fn().mockResolvedValue({ timestamp: "bad" }),
   } as unknown as Response)
 
-  await expect(client.getMeasurements()).rejects.toEqual(
-    expect.objectContaining<ApiError>({ kind: "parse" }),
-  )
+  await expect(client.getMeasurements()).rejects.toMatchObject({
+    kind: "parse",
+  })
 })
 
 test("maps network errors", async () => {
   global.fetch = jest.fn().mockRejectedValue(new Error("offline"))
 
-  await expect(client.getHealth()).rejects.toEqual(
-    expect.objectContaining<ApiError>({ kind: "network" }),
-  )
+  await expect(client.getHealth()).rejects.toMatchObject({
+    kind: "network",
+  })
 })
 
 test("parses historical payload with unknown input", async () => {

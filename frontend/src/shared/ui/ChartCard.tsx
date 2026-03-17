@@ -5,10 +5,10 @@ import { Card } from "./Card"
 interface ChartCardProps extends PropsWithChildren {
   title: string
   subtitle?: string
-  legend?: JSX.Element
+  legend?: React.JSX.Element
 }
 
-export function ChartCard({ title, subtitle, legend, children }: ChartCardProps): JSX.Element {
+export function ChartCard({ title, subtitle, legend, children }: ChartCardProps): React.JSX.Element {
   return (
     <Card>
       <div className="flex flex-wrap items-start justify-between gap-3">

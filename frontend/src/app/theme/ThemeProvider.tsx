@@ -19,7 +19,7 @@ function getInitialTheme(doc: Document): Theme {
   return resolveThemeFromWindow(window)
 }
 
-export function ThemeProvider({ children }: PropsWithChildren): JSX.Element {
+export function ThemeProvider({ children }: PropsWithChildren): React.JSX.Element {
   const [theme, setTheme] = useState<Theme>(() => getInitialTheme(document))
 
   useEffect(() => {

@@ -9,7 +9,7 @@ interface MetricCardProps {
   icon?: ReactNode
 }
 
-export function MetricCard({ label, value, helper, icon }: MetricCardProps): JSX.Element {
+export function MetricCard({ label, value, helper, icon }: MetricCardProps): React.JSX.Element {
   const parts = value.split(" ")
   const numberValue = parts[0] ?? value
   const unitValue = parts.length > 1 ? parts.slice(1).join(" ") : ""

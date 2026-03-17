@@ -12,7 +12,7 @@ function dotClass(level: "ok" | "warn" | "error"): string {
   return "bg-green-400"
 }
 
-export function StatusStrip(): JSX.Element {
+export function StatusStrip(): React.JSX.Element {
   const { status, loading, error } = useStatusPolling()
   const updatedAt = new Date(status.updatedAt).toLocaleTimeString("pt-BR", { hour12: false })
   const systemLabel =

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 
-export function NotFoundPage(): JSX.Element {
+export function NotFoundPage(): React.JSX.Element {
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
       <h2 className="text-2xl font-bold text-slate-900">Página não encontrada</h2>

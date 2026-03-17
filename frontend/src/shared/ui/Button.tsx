@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes } from "react"
 
-export function Button(props: ButtonHTMLAttributes<HTMLButtonElement>): JSX.Element {
+export function Button(props: ButtonHTMLAttributes<HTMLButtonElement>): React.JSX.Element {
   const { className, ...rest } = props
   return (
     <button

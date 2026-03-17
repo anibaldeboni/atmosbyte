@@ -16,7 +16,7 @@ function toneClass(tone: "info" | "warn" | "error"): string {
   return "toast toast-info"
 }
 
-export function Toast({ children, tone = "info", title, autoHideMs = 5000 }: ToastProps): JSX.Element {
+export function Toast({ children, tone = "info", title, autoHideMs = 5000 }: ToastProps): React.JSX.Element {
   const [visible, setVisible] = useState<boolean>(true)
   const timeoutRef = useRef<number | null>(null)
   const startedAtRef = useRef<number>(0)

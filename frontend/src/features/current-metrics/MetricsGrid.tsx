@@ -2,7 +2,7 @@ import type { MeasurementDto } from "../../shared/types/api"
 import { MetricCard } from "../../shared/ui/MetricCard"
 import { Skeleton } from "../../shared/ui/Skeleton"
 
-function TemperatureIcon(): JSX.Element {
+function TemperatureIcon(): React.JSX.Element {
   return (
     <svg viewBox="0 0 24 24" className="h-[26px] w-[26px]" fill="none" role="img">
       <path
@@ -17,7 +17,7 @@ function TemperatureIcon(): JSX.Element {
   )
 }
 
-function HumidityIcon(): JSX.Element {
+function HumidityIcon(): React.JSX.Element {
   return (
     <svg viewBox="0 0 24 24" className="h-[26px] w-[26px]" fill="none" role="img">
       <path
@@ -31,7 +31,7 @@ function HumidityIcon(): JSX.Element {
   )
 }
 
-function PressureIcon(): JSX.Element {
+function PressureIcon(): React.JSX.Element {
   return (
     <svg viewBox="0 0 24 24" className="h-[26px] w-[26px]" fill="none" role="img">
       <path d="M5 15h3M10.5 12h3M16 9h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
@@ -49,7 +49,7 @@ function formatValue(value: number, unit: string): string {
   return `${value.toFixed(1)} ${unit}`
 }
 
-export function MetricsGrid({ data, loading }: MetricsGridProps): JSX.Element {
+export function MetricsGrid({ data, loading }: MetricsGridProps): React.JSX.Element {
   if (loading) {
     return (
       <div className="grid gap-4 md:grid-cols-3" data-testid="metrics-skeleton-grid">

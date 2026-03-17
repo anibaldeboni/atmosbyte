@@ -21,7 +21,7 @@ function toDateInput(date: Date): string {
   return localDate.toISOString().slice(0, 16)
 }
 
-export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFormProps): JSX.Element {
+export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFormProps): React.JSX.Element {
   const now = new Date()
   const [from, setFrom] = useState<string>(toDateInput(new Date(now.getTime() - 24 * 60 * 60 * 1000)))
   const [to, setTo] = useState<string>(toDateInput(now))

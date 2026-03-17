@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event"
 import { ThemeProvider, useTheme } from "./ThemeProvider"
 import { THEME_STORAGE_KEY } from "./themeResolver"
 
-function ThemeProbe(): JSX.Element {
+function ThemeProbe(): React.JSX.Element {
   const { theme, toggleTheme } = useTheme()
 
   return (
