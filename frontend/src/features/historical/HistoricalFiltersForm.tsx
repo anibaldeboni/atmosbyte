@@ -106,7 +106,7 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
           <Button type="button" onClick={handleApply} className="w-full md:w-auto">
             Carregar
           </Button>
-          <Button type="button" onClick={handleExport} className="w-full bg-slate-700 hover:bg-slate-600 md:w-auto">
+          <Button type="button" onClick={handleExport} className="app-button-secondary w-full md:w-auto">
             Exportar CSV
           </Button>
         </div>

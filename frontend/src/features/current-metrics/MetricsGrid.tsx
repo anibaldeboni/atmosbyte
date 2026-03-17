@@ -61,7 +61,7 @@ export function MetricsGrid({ data, loading }: MetricsGridProps): React.JSX.Elem
   }
 
   if (!data) {
-    return <p className="text-sm text-slate-600">No measurement data available.</p>
+    return <p className="metric-empty-text text-sm">No measurement data available.</p>
   }
 
   return (

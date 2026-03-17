@@ -139,9 +139,9 @@ function MetricsLineChart({
             labelFormatter={(value) => (typeof value === "number" ? formatBrowserDateTime(value) : value)}
             formatter={(value, name) => [typeof value === "number" ? value.toFixed(2) : value, name]}
           />
-          <Line type="monotone" dataKey={minKey} name="Min." stroke="#22c55e" strokeWidth={2} dot={false} />
-          <Line type="monotone" dataKey={avgKey} name="Méd" stroke="#3b82f6" strokeWidth={2} dot={false} />
-          <Line type="monotone" dataKey={maxKey} name="Max" stroke="#ef4444" strokeWidth={2} dot={false} />
+          <Line type="monotone" dataKey={minKey} name="Min." stroke="var(--chart-line-min)" strokeWidth={2} dot={false} />
+          <Line type="monotone" dataKey={avgKey} name="Méd" stroke="var(--chart-line-avg)" strokeWidth={2} dot={false} />
+          <Line type="monotone" dataKey={maxKey} name="Max" stroke="var(--chart-line-max)" strokeWidth={2} dot={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>
@@ -152,15 +152,15 @@ function ChartLegend(): React.JSX.Element {
   return (
     <div className="historical-chart-legend flex items-center gap-4 text-[13px] font-semibold" aria-label="Legenda">
       <span className="inline-flex items-center gap-2">
-        <span className="h-2.5 w-2.5 rounded-full bg-[#ef4444]" aria-hidden="true" />
+        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "var(--chart-line-max)" }} aria-hidden="true" />
         Max
       </span>
       <span className="inline-flex items-center gap-2">
-        <span className="h-2.5 w-2.5 rounded-full bg-[#3b82f6]" aria-hidden="true" />
+        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "var(--chart-line-avg)" }} aria-hidden="true" />
         Méd
       </span>
       <span className="inline-flex items-center gap-2">
-        <span className="h-2.5 w-2.5 rounded-full bg-[#22c55e]" aria-hidden="true" />
+        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "var(--chart-line-min)" }} aria-hidden="true" />
         Min.
       </span>
     </div>

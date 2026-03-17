@@ -14,7 +14,7 @@ export function AppShell(): React.JSX.Element {
   const toggleLabel = theme === "light" ? "Ativar modo escuro" : "Ativar modo claro"
 
   return (
-    <div className="app-shell min-h-screen bg-gradient-to-b text-slate-900">
+    <div className="app-shell min-h-screen bg-gradient-to-b">
       <header className="app-shell-header border-b backdrop-blur">
         <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-4 md:flex-row md:items-center md:justify-between">
           <div className="flex min-w-0 items-center gap-3.5">

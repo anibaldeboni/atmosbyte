@@ -4,12 +4,12 @@ import { Toast } from "../../shared/ui/Toast"
 
 function dotClass(level: "ok" | "warn" | "error"): string {
   if (level === "error") {
-    return "bg-red-500"
+    return "status-dot-error"
   }
   if (level === "warn") {
-    return "bg-amber-400"
+    return "status-dot-warn"
   }
-  return "bg-green-400"
+  return "status-dot-ok"
 }
 
 export function StatusStrip(): React.JSX.Element {
@@ -53,7 +53,7 @@ export function StatusStrip(): React.JSX.Element {
           <span>{sensorLabel}</span>
         </p>
         <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
-          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-green-400" aria-hidden="true" />
+          <span className="status-dot-info h-2.5 w-2.5 shrink-0 rounded-full" aria-hidden="true" />
           <span>Última atualização: {updatedAt}</span>
         </p>
         <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">

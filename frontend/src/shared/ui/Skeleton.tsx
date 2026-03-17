@@ -3,5 +3,5 @@ interface SkeletonProps {
 }
 
 export function Skeleton({ className }: SkeletonProps): React.JSX.Element {
-  return <div className={`animate-pulse rounded-md bg-slate-200 ${className ?? ""}`.trim()} aria-hidden="true" />
+  return <div className={`skeleton animate-pulse rounded-md ${className ?? ""}`.trim()} aria-hidden="true" />
 }
