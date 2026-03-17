@@ -90,7 +90,7 @@ It is based on the current Go, Makefile, npm, and lint configuration.
 - `./frontend` contains the react frontend code.
 - Should rely on skills `frontend-design` `ui-uix-pro-max` and `web-design-guidelines` when designing
 - Should use component composition. Use skill `vercel-composition-patterns`
-- Should use skill `vercel-react-best-practices` for React issues
+- Should use skill `vercel-react-best-practices` for React coding
 - Prefer shadcn components instead of coding local component when available. Use skill `shadcn`
 
 ## Agent Workflow Recommendations
