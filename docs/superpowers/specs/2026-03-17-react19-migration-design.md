@@ -21,6 +21,7 @@ The migrated frontend must continue using the existing Go backend APIs and be se
 - Additional UX requirement: skeleton loading for not-yet-loaded components.
 - Additional build requirement: add `make run` to bundle SPA and run app locally.
 - Template-injected values used by old HTML must be removed end-to-end (UI and backend support code).
+- TypeScript rule: never use the `any` type; use explicit interfaces, unions, generics, or `unknown` with narrowing.
 
 ## 3) Non-Goals (YAGNI)
 
@@ -76,6 +77,11 @@ Proposed high-level structure in `frontend/src`:
 - `shared/ui/` - reusable UI building blocks (`AppShell`, `Button`, `Card`, `InlineAlert`, `EmptyState`, `Skeleton`).
 - `shared/api/` - typed API client, request helpers, and error normalization.
 - `shared/types/` - frontend domain types and DTO mapping contracts.
+
+Type safety requirement:
+
+- `any` is disallowed across frontend source and tests.
+- External or uncertain payloads should enter as `unknown` and be narrowed via type guards/parsers.
 
 ### 5.1 Reusable Core Components
 
@@ -216,6 +222,7 @@ Cutover checklist:
 - Tailwind utility-first styling is used (without carrying old page CSS into SPA).
 - Recharts powers historical visualizations.
 - Critical Jest tests pass for selected component scope.
+- Frontend TypeScript code and tests contain no `any` usage.
 - Skeletons render for required async blocks before data availability.
 - Skeletons are replaced progressively per block as data resolves.
 - Go server serves embedded SPA assets from binary.
