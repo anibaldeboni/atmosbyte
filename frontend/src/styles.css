@@ -51,6 +51,9 @@
   --chart-axis-line: #cbd5e1;
   --chart-grid-stroke: #e2e8f0;
   --historical-chart-legend: #475467;
+  --chart-line-max: #dc2626;
+  --chart-line-avg: #2563eb;
+  --chart-line-min: #0d9488;
   --button-primary-bg: #166534;
   --button-primary-hover: #15803d;
   --button-primary-text: #ecfdf5;
