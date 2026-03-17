@@ -30,19 +30,19 @@ export function StatusStrip(): JSX.Element {
 
   if (loading) {
     return (
-      <section className="border-b-2 border-[#1b7a39] bg-[#255f2f]">
+      <section className="status-strip border-b-2">
         <div className="mx-auto grid w-full max-w-[1480px] grid-cols-1 gap-x-3 gap-y-2 px-4 py-2 text-sm md:grid-cols-2 md:px-6 xl:grid-cols-4">
-          <Skeleton className="h-5 w-full bg-white/20" />
-          <Skeleton className="h-5 w-full bg-white/20" />
-          <Skeleton className="h-5 w-full bg-white/20" />
-          <Skeleton className="h-5 w-full bg-white/20" />
+          <Skeleton className="status-strip-skeleton h-5 w-full" />
+          <Skeleton className="status-strip-skeleton h-5 w-full" />
+          <Skeleton className="status-strip-skeleton h-5 w-full" />
+          <Skeleton className="status-strip-skeleton h-5 w-full" />
         </div>
       </section>
     )
   }
 
   return (
-    <section className="border-b-2 border-[#1b7a39] bg-[#255f2f] text-[#f4fff8]">
+    <section className="status-strip border-b-2">
       <div className="mx-auto grid w-full max-w-[1480px] grid-cols-1 gap-x-3 gap-y-2 px-4 py-2 text-[15px] md:grid-cols-2 md:px-6 xl:grid-cols-4">
         <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
           <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${dotClass(status.level)}`} aria-hidden="true" />

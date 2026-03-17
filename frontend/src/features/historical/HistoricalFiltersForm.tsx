@@ -70,30 +70,30 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
   }
 
   return (
-    <section className="max-w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <section className="historical-filters-card max-w-full overflow-hidden rounded-xl border p-4 shadow-sm">
       <div className="grid gap-4 md:grid-cols-4">
-        <label className="min-w-0 text-sm font-medium text-slate-700">
+        <label className="historical-field-label min-w-0 text-sm font-medium">
           De
           <input
-            className="mt-1 block w-full min-w-0 rounded-md border border-slate-300 px-3 py-2 text-[16px]"
+            className="historical-field-control mt-1 block w-full min-w-0 rounded-md border px-3 py-2 text-[16px]"
             type="datetime-local"
             value={from}
             onChange={(event) => setFrom(event.target.value)}
           />
         </label>
-        <label className="min-w-0 text-sm font-medium text-slate-700">
+        <label className="historical-field-label min-w-0 text-sm font-medium">
           Até
           <input
-            className="mt-1 block w-full min-w-0 rounded-md border border-slate-300 px-3 py-2 text-[16px]"
+            className="historical-field-control mt-1 block w-full min-w-0 rounded-md border px-3 py-2 text-[16px]"
             type="datetime-local"
             value={to}
             onChange={(event) => setTo(event.target.value)}
           />
         </label>
-        <label className="min-w-0 text-sm font-medium text-slate-700">
+        <label className="historical-field-label min-w-0 text-sm font-medium">
           Granularidade
           <select
-            className="mt-1 block w-full min-w-0 rounded-md border border-slate-300 px-3 py-2 text-[16px]"
+            className="historical-field-control mt-1 block w-full min-w-0 rounded-md border px-3 py-2 text-[16px]"
             value={type}
             onChange={(event) => setType(event.target.value as AggregationKind)}
           >

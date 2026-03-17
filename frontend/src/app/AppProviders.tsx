@@ -1,5 +1,7 @@
 import type { PropsWithChildren } from "react"
 
+import { ThemeProvider } from "./theme/ThemeProvider"
+
 export function AppProviders({ children }: PropsWithChildren): JSX.Element {
-  return <>{children}</>
+  return <ThemeProvider>{children}</ThemeProvider>
 }

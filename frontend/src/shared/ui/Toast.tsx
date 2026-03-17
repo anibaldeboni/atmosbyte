@@ -8,12 +8,12 @@ interface ToastProps extends PropsWithChildren {
 
 function toneClass(tone: "info" | "warn" | "error"): string {
   if (tone === "error") {
-    return "border-red-300 bg-red-50 text-red-800"
+    return "toast toast-error"
   }
   if (tone === "warn") {
-    return "border-amber-300 bg-amber-50 text-amber-900"
+    return "toast toast-warn"
   }
-  return "border-sky-300 bg-sky-50 text-sky-900"
+  return "toast toast-info"
 }
 
 export function Toast({ children, tone = "info", title, autoHideMs = 5000 }: ToastProps): JSX.Element {

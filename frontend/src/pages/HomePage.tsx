@@ -11,8 +11,8 @@ export function HomePage({ }: HomePageProps): JSX.Element {
   return (
     <div className="space-y-6">
       <section>
-        <h2 className="text-[42px] font-extrabold tracking-[-0.03em] text-slate-900">Visão geral do tempo atual</h2>
-        <p className="mt-1 text-[19px] font-medium tracking-[0.005em] text-[#667085]">
+        <h2 className="page-heading text-[42px] font-extrabold tracking-[-0.03em]">Visão geral do tempo atual</h2>
+        <p className="page-subheading mt-1 text-[19px] font-medium tracking-[0.005em]">
           Acompanhe os indicadores meteorológicos mais recentes
         </p>
       </section>

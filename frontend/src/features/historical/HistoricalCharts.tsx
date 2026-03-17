@@ -96,7 +96,7 @@ function DateHourTick(props: { x?: number; y?: number; payload?: { value: number
 
   return (
     <g transform={`translate(${x},${y})`}>
-      <text textAnchor="middle" fill="#475467" fontSize="12">
+      <text textAnchor="middle" fill="var(--chart-axis-text)" fontSize="12">
         <tspan x="0" dy="14">
           {parts.date}
         </tspan>
@@ -125,9 +125,15 @@ function MetricsLineChart({
     <div className="h-72 w-full">
       <ResponsiveContainer>
         <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
+          <CartesianGrid stroke="var(--chart-grid-stroke)" strokeDasharray="3 3" />
           <XAxis dataKey="timestampMs" tick={<DateHourTick />} height={44} minTickGap={28} />
-          <YAxis domain={yDomain} tickFormatter={(value) => String(Math.round(value))} />
+          <YAxis
+            domain={yDomain}
+            tickFormatter={(value) => String(Math.round(value))}
+            tick={{ fill: "var(--chart-axis-text)", fontSize: 12 }}
+            axisLine={{ stroke: "var(--chart-axis-line)" }}
+            tickLine={{ stroke: "var(--chart-axis-line)" }}
+          />
           <Tooltip
             labelFormatter={(value) => (typeof value === "number" ? formatBrowserDateTime(value) : value)}
             formatter={(value, name) => [typeof value === "number" ? value.toFixed(2) : value, name]}
@@ -143,7 +149,7 @@ function MetricsLineChart({
 
 function ChartLegend(): JSX.Element {
   return (
-    <div className="flex items-center gap-4 text-[13px] font-semibold text-[#475467]" aria-label="Legenda">
+    <div className="historical-chart-legend flex items-center gap-4 text-[13px] font-semibold" aria-label="Legenda">
       <span className="inline-flex items-center gap-2">
         <span className="h-2.5 w-2.5 rounded-full bg-[#ef4444]" aria-hidden="true" />
         Max

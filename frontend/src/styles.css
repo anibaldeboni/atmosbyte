@@ -6,9 +6,251 @@
 
 :root {
   color-scheme: light;
+  --shell-bg-start: #e2e8f0;
+  --shell-bg-end: #ffffff;
+  --shell-text: #0f172a;
+  --shell-header-border: #e2e8f0;
+  --shell-header-bg: rgba(255, 255, 255, 0.8);
+  --shell-brand-icon: #1f5d2b;
+  --shell-tagline: #5f6d7a;
+  --shell-nav-link: #3f4a57;
+  --shell-nav-link-hover: #e2e8f0;
+  --shell-nav-link-active: #0f7431;
+  --shell-theme-toggle: #2d3748;
+  --shell-theme-toggle-hover: rgba(15, 23, 42, 0.1);
+  --shell-theme-toggle-focus: rgba(15, 116, 49, 0.45);
+  --page-heading: #0f172a;
+  --page-subheading: #667085;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --card-title: #475467;
+  --card-heading: #111827;
+  --card-primary-text: #0f172a;
+  --card-secondary-text: #667085;
+  --status-strip-bg: #255f2f;
+  --status-strip-border: #1b7a39;
+  --status-strip-text: #f4fff8;
+  --status-strip-skeleton: rgba(255, 255, 255, 0.22);
+  --toast-error-bg: #fef2f2;
+  --toast-error-border: #fca5a5;
+  --toast-error-text: #991b1b;
+  --toast-warn-bg: #fffbeb;
+  --toast-warn-border: #fcd34d;
+  --toast-warn-text: #78350f;
+  --toast-info-bg: #f0f9ff;
+  --toast-info-border: #7dd3fc;
+  --toast-info-text: #0c4a6e;
+  --historical-filters-bg: #ffffff;
+  --historical-filters-border: #e2e8f0;
+  --historical-field-label: #334155;
+  --historical-field-bg: #ffffff;
+  --historical-field-border: #cbd5e1;
+  --historical-field-text: #111827;
+  --historical-field-focus: rgba(15, 116, 49, 0.35);
+  --chart-axis-text: #475467;
+  --chart-axis-line: #cbd5e1;
+  --chart-grid-stroke: #e2e8f0;
+  --historical-chart-legend: #475467;
+  --button-primary-bg: #166534;
+  --button-primary-hover: #15803d;
+  --button-primary-text: #ecfdf5;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --shell-bg-start: #000000;
+  --shell-bg-end: #050505;
+  --shell-text: #f4f4f5;
+  --shell-header-border: #171717;
+  --shell-header-bg: rgba(0, 0, 0, 0.92);
+  --shell-brand-icon: #7cf8b2;
+  --shell-tagline: #a1a1aa;
+  --shell-nav-link: #d4d4d8;
+  --shell-nav-link-hover: rgba(63, 63, 70, 0.55);
+  --shell-nav-link-active: #86efac;
+  --shell-theme-toggle: #e2e8f0;
+  --shell-theme-toggle-hover: rgba(63, 63, 70, 0.55);
+  --shell-theme-toggle-focus: rgba(134, 239, 172, 0.5);
+  --page-heading: #fafafa;
+  --page-subheading: #a1a1aa;
+  --card-bg: #0a0a0a;
+  --card-border: #262626;
+  --card-title: #e4e4e7;
+  --card-heading: #fafafa;
+  --card-primary-text: #fafafa;
+  --card-secondary-text: #a1a1aa;
+  --status-strip-bg: linear-gradient(90deg, #04150b 0%, #082512 55%, #0b2c15 100%);
+  --status-strip-border: #39ff6a;
+  --status-strip-text: #e8ffee;
+  --status-strip-skeleton: rgba(134, 239, 172, 0.22);
+  --toast-error-bg: #2a1111;
+  --toast-error-border: #ef4444;
+  --toast-error-text: #fecaca;
+  --toast-warn-bg: #2b220d;
+  --toast-warn-border: #f59e0b;
+  --toast-warn-text: #fde68a;
+  --toast-info-bg: #0c2230;
+  --toast-info-border: #0ea5e9;
+  --toast-info-text: #bae6fd;
+  --historical-filters-bg: #0a0a0a;
+  --historical-filters-border: #262626;
+  --historical-field-label: #d4d4d8;
+  --historical-field-bg: #111111;
+  --historical-field-border: #3f3f46;
+  --historical-field-text: #fafafa;
+  --historical-field-focus: rgba(57, 255, 106, 0.35);
+  --chart-axis-text: #a1a1aa;
+  --chart-axis-line: #3f3f46;
+  --chart-grid-stroke: #27272a;
+  --historical-chart-legend: #d4d4d8;
+  --button-primary-bg: #86efac;
+  --button-primary-hover: #4ade80;
+  --button-primary-text: #052e16;
 }
 
 body {
   margin: 0;
   font-family: "Manrope", "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+.app-shell {
+  background-image: linear-gradient(to bottom, var(--shell-bg-start), var(--shell-bg-end));
+  color: var(--shell-text);
+}
+
+.app-shell-header {
+  border-color: var(--shell-header-border);
+  background-color: var(--shell-header-bg);
+}
+
+.app-shell-brand-icon {
+  color: var(--shell-brand-icon);
+}
+
+.app-shell-tagline {
+  color: var(--shell-tagline);
+}
+
+.app-shell-nav-link {
+  color: var(--shell-nav-link);
+}
+
+.app-shell-nav-link:hover {
+  background-color: var(--shell-nav-link-hover);
+}
+
+.app-shell-nav-link-active {
+  color: var(--shell-nav-link-active);
+  box-shadow: inset 0 -2px 0 var(--shell-nav-link-active);
+}
+
+.app-shell-theme-toggle {
+  color: var(--shell-theme-toggle);
+}
+
+.app-shell-theme-toggle:hover {
+  background-color: var(--shell-theme-toggle-hover);
+}
+
+.app-shell-theme-toggle:focus-visible {
+  outline: 2px solid var(--shell-theme-toggle-focus);
+  outline-offset: 2px;
+}
+
+.page-heading {
+  color: var(--page-heading);
+}
+
+.page-subheading {
+  color: var(--page-subheading);
+}
+
+.app-card {
+  border-color: var(--card-border);
+  background-color: var(--card-bg);
+}
+
+.metric-card-label {
+  color: var(--card-title);
+}
+
+.metric-card-value {
+  color: var(--card-primary-text);
+}
+
+.metric-card-helper {
+  color: var(--card-secondary-text);
+}
+
+.chart-card-title {
+  color: var(--card-heading);
+}
+
+.chart-card-subtitle {
+  color: var(--card-secondary-text);
+}
+
+.status-strip {
+  border-color: var(--status-strip-border);
+  background: var(--status-strip-bg);
+  color: var(--status-strip-text);
+}
+
+.status-strip-skeleton {
+  background-color: var(--status-strip-skeleton) !important;
+}
+
+.toast {
+  border-width: 1px;
+}
+
+.toast-error {
+  background-color: var(--toast-error-bg);
+  border-color: var(--toast-error-border);
+  color: var(--toast-error-text);
+}
+
+.toast-warn {
+  background-color: var(--toast-warn-bg);
+  border-color: var(--toast-warn-border);
+  color: var(--toast-warn-text);
+}
+
+.toast-info {
+  background-color: var(--toast-info-bg);
+  border-color: var(--toast-info-border);
+  color: var(--toast-info-text);
+}
+
+.historical-filters-card {
+  background-color: var(--historical-filters-bg);
+  border-color: var(--historical-filters-border);
+}
+
+.historical-field-label {
+  color: var(--historical-field-label);
+}
+
+.historical-field-control {
+  background-color: var(--historical-field-bg);
+  border-color: var(--historical-field-border);
+  color: var(--historical-field-text);
+}
+
+.historical-field-control:focus-visible {
+  outline: 2px solid var(--historical-field-focus);
+  outline-offset: 1px;
+}
+
+.historical-chart-legend {
+  color: var(--historical-chart-legend);
+}
+
+.app-button {
+  background-color: var(--button-primary-bg);
+  color: var(--button-primary-text);
+}
+
+.app-button:hover {
+  background-color: var(--button-primary-hover);
 }

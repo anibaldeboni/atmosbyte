@@ -6,6 +6,11 @@
     <title>Atmosbyte</title>
   </head>
   <body>
+    <script type="module">
+      import { applyInitialTheme } from "/src/app/theme/bootstrapTheme.ts"
+
+      applyInitialTheme(document)
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

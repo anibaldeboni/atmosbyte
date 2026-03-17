@@ -117,14 +117,14 @@ test("shows degraded notice and 60s interval after 3 failed cycles then recovers
   await waitFor(() => {
     expect(screen.getByText("20.0")).toBeInTheDocument()
     expect(screen.getByText("C")).toBeInTheDocument()
-    expect(screen.getByText(/Connection is degraded/)).toBeInTheDocument()
+    expect(screen.getByText(/Conexão degradada/)).toBeInTheDocument()
     expect(screen.getByText(/60s/)).toBeInTheDocument()
   })
 
   rerender(<HomePage />)
 
   await waitFor(() => {
-    expect(screen.queryByText(/Connection is degraded/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Conexão degradada/)).not.toBeInTheDocument()
     expect(screen.getByText("22.0")).toBeInTheDocument()
     expect(screen.getByText("C")).toBeInTheDocument()
   })

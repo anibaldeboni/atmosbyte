@@ -50,8 +50,8 @@ export function HistoricalPage({ }: HistoricalPageProps): JSX.Element {
   return (
     <div className="space-y-6">
       <section>
-        <h2 className="text-[42px] font-extrabold tracking-[-0.02em] text-slate-900">Análise do Histórico Meteorológico</h2>
-        <p className="mt-1 text-[18px] text-[#667085]">Visualização de dados meteorológicos históricos</p>
+        <h2 className="page-heading text-[42px] font-extrabold tracking-[-0.02em]">Análise do Histórico Meteorológico</h2>
+        <p className="page-subheading mt-1 text-[18px]">Visualização de dados meteorológicos históricos</p>
       </section>
       <HistoricalFiltersForm onApply={handlers.onApply} onExport={handlers.onExport} />
       <Suspense fallback={<Skeleton className="h-72 w-full" />}>
