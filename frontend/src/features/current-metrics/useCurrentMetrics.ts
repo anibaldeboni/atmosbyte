@@ -31,31 +31,31 @@ export function useCurrentMetrics(policy: MetricsPolicy = DEFAULT_POLICY): Curre
   const [data, setData] = useState<MeasurementDto | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
-	const [intervalMs, setIntervalMs] = useState<number>(policy.intervalMs)
+  const [intervalMs, setIntervalMs] = useState<number>(policy.intervalMs)
   const failures = useRef<number>(0)
 
   const runCycle = useCallback(async () => {
     let attempt = 0
-    for (;;) {
+    for (; ;) {
       try {
-			const next = await client.getMeasurements(policy.timeoutMs)
-			failures.current = 0
-			setIntervalMs(policy.intervalMs)
+        const next = await client.getMeasurements(policy.timeoutMs)
+        failures.current = 0
+        setIntervalMs(policy.intervalMs)
         setData(next)
         setError(null)
         setLoading(false)
         return
       } catch (unknownError: unknown) {
-		if (attempt < policy.retryCount) {
+        if (attempt < policy.retryCount) {
           attempt += 1
           continue
         }
 
         failures.current += 1
-		if (failures.current >= policy.degradedThreshold) {
-			setIntervalMs(policy.degradedBackoffMs)
-		}
-        setError(unknownError instanceof ApiError ? unknownError.message : "Measurement request failed")
+        if (failures.current >= policy.degradedThreshold) {
+          setIntervalMs(policy.degradedBackoffMs)
+        }
+        setError(unknownError instanceof ApiError ? unknownError.message : "Atualização dos dados falhou")
         setLoading(false)
         return
       }
@@ -83,11 +83,11 @@ export function useCurrentMetrics(policy: MetricsPolicy = DEFAULT_POLICY): Curre
     }
   }, [intervalMs, runCycle])
 
-	return {
-		data,
-		loading,
-		error,
-		degraded: failures.current >= policy.degradedThreshold,
-		intervalMs,
-	}
+  return {
+    data,
+    loading,
+    error,
+    degraded: failures.current >= policy.degradedThreshold,
+    intervalMs,
+  }
 }
