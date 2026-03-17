@@ -138,6 +138,14 @@ function MetricsLineChart({
           <Tooltip
             labelFormatter={(value) => (typeof value === "number" ? formatBrowserDateTime(value) : value)}
             formatter={(value, name) => [typeof value === "number" ? value.toFixed(2) : value, name]}
+            contentStyle={{
+              backgroundColor: "var(--chart-tooltip-bg)",
+              borderColor: "var(--chart-tooltip-border)",
+              borderRadius: "0.5rem",
+              color: "var(--chart-tooltip-text)",
+            }}
+            labelStyle={{ color: "var(--chart-tooltip-label)", fontWeight: 600 }}
+            itemStyle={{ color: "var(--chart-tooltip-text)", fontWeight: 500 }}
           />
           <Line type="monotone" dataKey={minKey} name="Min." stroke="var(--chart-line-min)" strokeWidth={2} dot={false} />
           <Line type="monotone" dataKey={avgKey} name="Méd" stroke="var(--chart-line-avg)" strokeWidth={2} dot={false} />

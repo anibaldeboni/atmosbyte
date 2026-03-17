@@ -54,6 +54,10 @@
   --chart-line-max: #dc2626;
   --chart-line-avg: #2563eb;
   --chart-line-min: #0d9488;
+  --chart-tooltip-bg: #ffffff;
+  --chart-tooltip-border: #cbd5e1;
+  --chart-tooltip-text: #0f172a;
+  --chart-tooltip-label: #334155;
   --button-primary-bg: #166534;
   --button-primary-hover: #15803d;
   --button-primary-text: #ecfdf5;
@@ -138,6 +142,10 @@
   --chart-line-max: #ff4d5a;
   --chart-line-avg: #4d88ff;
   --chart-line-min: #19c6a2;
+  --chart-tooltip-bg: #171f31;
+  --chart-tooltip-border: #3a4c6b;
+  --chart-tooltip-text: #eef4ff;
+  --chart-tooltip-label: #d3ddef;
   --skeleton-bg: #33435f;
   --metric-empty-text: #97a8c3;
   --status-dot-ok: #20cc9b;
