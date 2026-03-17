@@ -123,12 +123,13 @@ function MetricsLineChart({
 
   return (
     <div className="h-72 w-full">
-      <ResponsiveContainer>
-        <LineChart data={data}>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
           <CartesianGrid stroke="var(--chart-grid-stroke)" strokeDasharray="3 3" />
           <XAxis dataKey="timestampMs" tick={<DateHourTick />} height={44} minTickGap={28} />
           <YAxis
             domain={yDomain}
+            width={30}
             tickFormatter={(value) => String(Math.round(value))}
             tick={{ fill: "var(--chart-axis-text)", fontSize: 12 }}
             axisLine={{ stroke: "var(--chart-axis-line)" }}
