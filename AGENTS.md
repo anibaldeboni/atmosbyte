@@ -114,7 +114,11 @@ It is based on the current Go, Makefile, npm, and lint configuration.
 - Keep zero-value behavior sensible where practical.
 
 ## Frontend development
-- Should rely on skills `frontend-design` `ui-uix-pro-max` and `web-design-guidelines`
+- Should rely on skills `frontend-design` `ui-uix-pro-max` and `web-design-guidelines` when designing
+- Should use component composition. Use skill `vercel-composition-patterns`
+- Should use skill `vercel-react-best-practices` for React issues
+- Should use `next-best-practices` for Next.js issues
+- Prefer shadcn components instead of coding local component when available. Use skill `shadcn`
 
 ## Error Handling Guidelines
 
