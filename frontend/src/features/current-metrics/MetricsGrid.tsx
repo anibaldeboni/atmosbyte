@@ -61,19 +61,19 @@ export function MetricsGrid({ data, loading }: MetricsGridProps): React.JSX.Elem
   }
 
   if (!data) {
-    return <p className="metric-empty-text text-sm">No measurement data available.</p>
+    return <p className="metric-empty-text text-sm">Dados meteorológicos indisponíveis.</p>
   }
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <MetricCard
-        label="Temperature"
+        label="Temperatura"
         value={formatValue(data.temperature, "C")}
-        helper={`Source: ${data.source}`}
+        helper={`Fonte: ${data.source}`}
         icon={<TemperatureIcon />}
       />
-      <MetricCard label="Humidity" value={formatValue(data.humidity, "%")} icon={<HumidityIcon />} />
-      <MetricCard label="Pressure" value={formatValue(data.pressure / 100, "hPa")} icon={<PressureIcon />} />
+      <MetricCard label="Umidade" value={formatValue(data.humidity, "%")} icon={<HumidityIcon />} />
+      <MetricCard label="Pressão" value={formatValue(data.pressure / 100, "hPa")} icon={<PressureIcon />} />
     </div>
   )
 }
