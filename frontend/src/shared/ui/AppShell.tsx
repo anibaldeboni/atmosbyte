@@ -37,6 +37,12 @@ export function AppShell(): React.JSX.Element {
             </div>
           </div>
           <nav className="flex w-full items-center gap-2 overflow-x-auto md:w-auto md:gap-3" aria-label="Primary">
+            <NavLink to="/" end className={({ isActive }) => linkClass(isActive)}>
+              Início
+            </NavLink>
+            <NavLink to="/historical" className={({ isActive }) => linkClass(isActive)}>
+              Histórico
+            </NavLink>
             <button
               type="button"
               className="app-shell-theme-toggle inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md"
@@ -60,12 +66,6 @@ export function AppShell(): React.JSX.Element {
                 </svg>
               )}
             </button>
-            <NavLink to="/" end className={({ isActive }) => linkClass(isActive)}>
-              Início
-            </NavLink>
-            <NavLink to="/historical" className={({ isActive }) => linkClass(isActive)}>
-              Histórico
-            </NavLink>
           </nav>
         </div>
       </header>
