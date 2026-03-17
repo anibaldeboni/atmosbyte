@@ -28,14 +28,6 @@ type ErrorResponse struct {
 	Time  time.Time `json:"timestamp"`
 }
 
-// TemplateData holds data passed to HTML templates
-type TemplateData struct {
-	Title           string
-	SystemStartTime string
-	Routes          map[string]string
-	QueueAvailable  bool
-}
-
 // loggingResponseWriter wraps http.ResponseWriter to capture status codes
 type loggingResponseWriter struct {
 	http.ResponseWriter

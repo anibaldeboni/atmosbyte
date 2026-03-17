@@ -3,9 +3,12 @@ package web
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
+	"path"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/anibaldeboni/zero-paper/atmosbyte/weather"
@@ -74,21 +77,6 @@ func (s *Server) handleQueue(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.sendJSONResponse(w, response, http.StatusOK)
-}
-
-// handleHistoricalWeather handles GET /historical - returns historical weather page
-func (s *Server) handleHistoricalWeather(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		s.sendErrorResponse(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-	if err := s.historicalTempl.Execute(w, nil); err != nil {
-		log.Printf("Failed to execute historical template: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
 }
 
 // handleHistoricalWeatherAPI handles GET /data - returns historical weather data as JSON
@@ -218,34 +206,51 @@ func sortAggregatesByDateAsc(data []weather.AggregateMeasurement) {
 	})
 }
 
-// handleRoot handles GET / - returns HTML page with weather information
-func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
+func hasFileExtension(pathName string) bool {
+	base := path.Base(pathName)
+	if base == "." || base == ".." {
+		return false
+	}
+	return path.Ext(base) != ""
+}
+
+func serveEmbeddedIndex(w http.ResponseWriter) {
+	indexBytes, err := fs.ReadFile(frontendAssetFS(), "index.html")
+	if err != nil {
+		http.Error(w, "Frontend index unavailable", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(indexBytes)
+}
+
+func (s *Server) handleSPA(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		s.sendErrorResponse(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	// Serve HTML page
-	data := TemplateData{
-		Title:           "Atmosbyte - Monitoramento Meteorológico",
-		SystemStartTime: s.systemStartTime.Format("02/01/2006 15:04:05"),
-		Routes:          s.GetRoutes(),
-		QueueAvailable:  s.queue != nil,
+	cleanedPath := cleanAssetPath(r.URL.Path)
+
+	if strings.HasPrefix(cleanedPath, "assets/") {
+		if _, err := fs.Stat(frontendAssetFS(), cleanedPath); err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		http.FileServer(http.FS(frontendAssetFS())).ServeHTTP(w, r)
+		return
 	}
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-	if err := s.indexTempl.Execute(w, data); err != nil {
-		log.Printf("Failed to execute template: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	if hasFileExtension(cleanedPath) {
+		if _, err := fs.Stat(frontendAssetFS(), cleanedPath); err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		http.FileServer(http.FS(frontendAssetFS())).ServeHTTP(w, r)
+		return
 	}
-}
 
-func (s *Server) handleNotFound(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-	if err := s.notFoundTempl.Execute(w, nil); err != nil {
-		log.Printf("Failed to execute 404 template: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
+	serveEmbeddedIndex(w)
 }

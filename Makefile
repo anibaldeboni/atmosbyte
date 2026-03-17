@@ -35,12 +35,14 @@ help: ## Show this help message
 	@echo "  clean              Remove build artifacts"
 	@echo "  fmt                Format Go code"
 	@echo "  test               Run tests"
+	@echo "  run                Build frontend and run app"
 	@echo "  build              Build binary for target platform (development)"
-	@echo "  build-prod         Build binary with minified templates (production)"
-	@echo "  build-rpi          Build for Raspberry Pi (ARM64) with minified templates"
-	@echo "  minify-templates   Minify HTML templates for production"
-	@echo "  clean-templates    Remove minified templates"
-	@echo "  watch-templates    Watch templates for changes and auto-minify"
+	@echo "  build-prod         Build binary for production"
+	@echo "  build-rpi          Build for Raspberry Pi (ARM64)"
+	@echo "  frontend-install   Install frontend dependencies"
+	@echo "  frontend-build     Build frontend SPA bundle"
+	@echo "  frontend-sync      Sync frontend/dist into embedded web assets"
+	@echo "  clean-frontend     Remove frontend build artifacts"
 	@echo "  version            Show version information"
 	@echo "  info               Show build information"
 	@echo ""
@@ -53,9 +55,9 @@ help: ## Show this help message
 	@echo "  service-logs       View service logs"
 	@echo ""
 	@echo "$(YELLOW)Development workflow:$(RESET)"
-	@echo "  make build                    # Build for development (original templates)"
-	@echo "  make build-prod               # Build for production (minified templates)"
-	@echo "  make watch-templates          # Auto-minify templates on changes"
+	@echo "  make run                      # Build frontend and run locally"
+	@echo "  make build                    # Build binary for current platform"
+	@echo "  make build-prod               # Build production binary"
 	@echo ""
 	@echo "$(YELLOW)Build examples:$(RESET)"
 	@echo "  make build                    # Build for current platform"
@@ -85,29 +87,34 @@ test: ## Run tests
 	@go test -v ./...
 	@echo "$(GREEN)✓ Tests completed$(RESET)"
 
-.PHONY: minify-templates
-minify-templates: ## Minify HTML templates for production build
-	@echo "$(YELLOW)Installing build dependencies...$(RESET)"
-	@npm install --silent
-	@echo "$(YELLOW)Minifying HTML templates...$(RESET)"
-	@npm run minify
-	@echo "$(GREEN)✓ Templates minified$(RESET)"
+.PHONY: frontend-install
+frontend-install: ## Install frontend dependencies
+	@echo "$(YELLOW)Installing frontend dependencies...$(RESET)"
+	@npm --prefix frontend install --silent
+	@echo "$(GREEN)✓ Frontend dependencies installed$(RESET)"
 
-.PHONY: clean-templates
-clean-templates: ## Remove minified templates
-	@echo "$(YELLOW)Cleaning minified templates...$(RESET)"
-	@npm run clean 2>/dev/null || rm -rf web/templates-min
-	@echo "$(GREEN)✓ Minified templates cleaned$(RESET)"
+.PHONY: frontend-build
+frontend-build: frontend-install ## Build frontend SPA bundle
+	@echo "$(YELLOW)Building frontend SPA...$(RESET)"
+	@npm --prefix frontend run build
+	@echo "$(GREEN)✓ Frontend bundle built$(RESET)"
 
-.PHONY: watch-templates
-watch-templates: ## Watch templates for changes and auto-minify
-	@echo "$(YELLOW)Starting template watch mode...$(RESET)"
-	@echo "$(CYAN)Press Ctrl+C to stop$(RESET)"
-	@npm install --silent
-	@npm run watch
+.PHONY: frontend-sync
+frontend-sync: frontend-build ## Sync frontend dist for Go embed
+	@echo "$(YELLOW)Syncing frontend dist into web/frontend_dist...$(RESET)"
+	@rm -rf web/frontend_dist
+	@mkdir -p web/frontend_dist
+	@cp -R frontend/dist/. web/frontend_dist
+	@echo "$(GREEN)✓ Frontend assets synced$(RESET)"
+
+.PHONY: clean-frontend
+clean-frontend: ## Remove frontend build artifacts
+	@echo "$(YELLOW)Cleaning frontend build artifacts...$(RESET)"
+	@rm -rf frontend/dist web/frontend_dist
+	@echo "$(GREEN)✓ Frontend artifacts cleaned$(RESET)"
 
 .PHONY: build
-build: $(BUILD_DIR) fmt ## Build binary for target platform
+build: $(BUILD_DIR) fmt frontend-sync ## Build binary for target platform
 	@echo "$(YELLOW)Building $(PROJECT_NAME) for $(GOOS)/$(GOARCH)...$(RESET)"
 	@mkdir -p $(dir $(BINARY_PATH))
 	@GOOS=$(GOOS) GOARCH=$(GOARCH) go build \
@@ -118,11 +125,10 @@ build: $(BUILD_DIR) fmt ## Build binary for target platform
 	@ls -lh $(BINARY_PATH)
 
 .PHONY: build-prod
-build-prod: $(BUILD_DIR) fmt minify-templates ## Build production binary with minified templates
+build-prod: $(BUILD_DIR) fmt frontend-sync ## Build production binary
 	@echo "$(YELLOW)Building $(PROJECT_NAME) for $(GOOS)/$(GOARCH) (production)...$(RESET)"
 	@mkdir -p $(dir $(BINARY_PATH))
 	@GOOS=$(GOOS) GOARCH=$(GOARCH) go build \
-		-tags minified \
 		-ldflags "$(LDFLAGS)" \
 		-o $(BINARY_PATH) \
 		$(MAIN_FILE)
@@ -141,11 +147,10 @@ info: ## Show build information
 	@echo "  Build Dir:   $(BUILD_DIR)"
 
 .PHONY: build-rpi
-build-rpi: $(BUILD_DIR) fmt minify-templates ## Build binary for Raspberry Pi (ARM64) with minified templates
+build-rpi: $(BUILD_DIR) fmt frontend-sync ## Build binary for Raspberry Pi (ARM64)
 	@echo "$(YELLOW)Building $(PROJECT_NAME) for Raspberry Pi (linux/arm64)...$(RESET)"
 	@mkdir -p $(BUILD_DIR)/linux-arm64
 	@GOOS=linux GOARCH=arm64 go build \
-		-tags minified \
 		-ldflags "$(LDFLAGS)" \
 		-o $(BUILD_DIR)/linux-arm64/$(PROJECT_NAME) \
 		$(MAIN_FILE)
@@ -198,3 +203,8 @@ package-rpi: build-rpi ## Create deployment package for Raspberry Pi
 		-C $(BUILD_DIR)/linux-arm64 $(PROJECT_NAME) \
 		-C ../../ atmosbyte.service install-service.sh atmosbyte.yaml.example
 	@echo "$(GREEN)✓ Deployment package created: dist/atmosbyte-rpi-$(BUILD_TIME).tar.gz$(RESET)"
+
+.PHONY: run
+run: build ## Build frontend + backend and run locally
+	@echo "$(YELLOW)Starting Atmosbyte...$(RESET)"
+	@$(BINARY_PATH)

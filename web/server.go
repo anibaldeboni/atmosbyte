@@ -3,9 +3,7 @@ package web
 import (
 	"context"
 	"fmt"
-	"html/template"
 	"log"
-	"maps"
 	"net/http"
 	"time"
 
@@ -15,18 +13,12 @@ import (
 
 // Server encapsulates the HTTP server configuration and dependencies
 type Server struct {
-	config          *Config
-	htmlData        *TemplateData
-	sensor          bme280.Reader
-	indexTempl      *template.Template
-	historicalTempl *template.Template
-	notFoundTempl   *template.Template
-	server          *http.Server
-	routes          map[string]string
-	queue           QueueStatsProvider
-	ctx             context.Context
-	systemStartTime time.Time
-	repository      MeasurementRepository
+	config     *Config
+	sensor     bme280.Reader
+	server     *http.Server
+	queue      QueueStatsProvider
+	ctx        context.Context
+	repository MeasurementRepository
 }
 
 type MeasurementRepository interface {
@@ -40,40 +32,11 @@ func NewServer(ctx context.Context, sensor bme280.Reader, config *Config, queue 
 		panic("web.Config cannot be nil - use config.Load().WebConfig() instead")
 	}
 
-	// Compile the HTML templates
-	tmpl, err := template.New("index").Parse(indexTemplate)
-	if err != nil {
-		log.Fatalf("Failed to parse HTML template: %v", err)
-	}
-
-	historicalTmpl, err := template.New("historical").Parse(historicalTemplate)
-	if err != nil {
-		log.Fatalf("Failed to parse historical template: %v", err)
-	}
-
-	notFoundTmpl, err := template.New("404").Parse(notFoundTemplate)
-	if err != nil {
-		log.Fatalf("Failed to parse 404 template: %v", err)
-	}
-
 	s := &Server{
-		config:          config,
-		sensor:          sensor,
-		indexTempl:      tmpl,
-		historicalTempl: historicalTmpl,
-		notFoundTempl:   notFoundTmpl,
-		queue:           queue,
-		ctx:             ctx,
-		systemStartTime: time.Now(), // Thread-safe: set once during initialization
-		routes: map[string]string{
-			"/":             "Interface web principal",
-			"/health":       "Status de saúde do sistema",
-			"/measurements": "Dados atuais do sensor (JSON)",
-			"/queue":        "Status da fila de processamento (JSON)",
-			"/historical":   "Dados históricos do tempo",
-			"/data":         "API para dados históricos do tempo (JSON)",
-			"/data/export":  "Exportar dados históricos (CSV)",
-		},
+		config:     config,
+		sensor:     sensor,
+		queue:      queue,
+		ctx:        ctx,
 		repository: repo,
 	}
 
@@ -93,24 +56,13 @@ func NewServer(ctx context.Context, sensor bme280.Reader, config *Config, queue 
 
 // setupRoutes configures all HTTP routes
 func (s *Server) setupRoutes(mux *http.ServeMux) {
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(staticFileSystem())))
+	mux.Handle("/assets/", http.FileServer(http.FS(frontendAssetFS())))
 	mux.HandleFunc("/measurements", s.handleMeasurements)
 	mux.HandleFunc("/health", s.handleHealth)
 	mux.HandleFunc("/queue", s.handleQueue)
-	mux.HandleFunc("/historical", s.handleHistoricalWeather)
 	mux.HandleFunc("/data", s.handleHistoricalWeatherAPI)
 	mux.HandleFunc("/data/export", s.handleHistoricalWeatherCSV)
-	mux.HandleFunc("GET /{$}", s.handleRoot)
-	mux.HandleFunc("/", s.handleNotFound)
-}
-
-// GetRoutes returns the configured routes and their descriptions
-// Thread-safe: creates a copy to avoid concurrent access issues
-func (s *Server) GetRoutes() map[string]string {
-	// Create a copy to avoid race conditions on map access
-	routesCopy := make(map[string]string, len(s.routes))
-	maps.Copy(routesCopy, s.routes)
-	return routesCopy
+	mux.HandleFunc("/", s.handleSPA)
 }
 
 // Start starts the HTTP server and handles graceful shutdown via context

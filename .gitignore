@@ -12,3 +12,7 @@ web/templates-min/
 # Node.js dependencies
 node_modules/
 package-lock.json
+
+# Frontend build outputs
+frontend/dist/
+web/frontend_dist/
