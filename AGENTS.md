@@ -86,10 +86,11 @@ It is based on the current Go, Makefile, npm, and lint configuration.
   - `config`: loading defaults and YAML config.
   - `queue`: generic queue, retry policy, circuit breaker.
   - `repository`: SQLite persistence and retrieval.
-  - `web`: HTTP server, handlers, templates, responses.
+  - `web`: HTTP server, handlers, responses.
   - `bme280`: hardware and simulated sensor interactions.
 - Prefer extending existing package boundaries over adding cross-cutting helpers in `main`.
 - Keep `main.go` as orchestration and wiring, not business logic.
+- `./frontend` contains the react frontend code.
 
 ## Go Style Guidelines
 
