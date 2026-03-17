@@ -11,12 +11,15 @@ Goal: make `datetime-local` fields fit entirely within the historical filters ca
 
 This spec follows a focus-first scope: fix the rendering issue directly and standardize the solution for reuse, while avoiding unrelated feature work.
 
+For this spec, "mobile" means viewport widths `320px` to `390px` in portrait orientation on iOS Safari and Chromium-based mobile browsers.
+
 ## 2) Validated Decisions
 
 - Reuse-first approach: create a shared mobile-safe style contract for `input[type="datetime-local"]`.
 - Keep one-field date+time input model (`datetime-local`) on mobile and desktop.
 - Allow CSS plus responsive layout adjustments where needed.
 - Preserve all filtering behavior (`from`, `to`, `type`, apply/export flow, validation).
+- Reuse is limited to introducing one shared datetime utility and applying it only in `HistoricalFiltersForm` in this change; broader adoption is deferred.
 
 ## 3) Non-Goals (YAGNI)
 
@@ -47,7 +50,8 @@ Create a shared class (for example, `app-datetime-input`) that guarantees:
 - `max-width: 100%`
 - `min-width: 0`
 - `box-sizing: border-box`
-- Mobile-safe text sizing and intrinsic width containment for browser datetime controls
+- Explicit rules that constrain datetime intrinsic sizing on mobile browsers, including font-size and inline-size constraints
+- No reliance on browser default datetime sizing behavior; width must remain fully constrained by parent container
 
 The class is additive and used alongside existing visual classes.
 
@@ -85,16 +89,16 @@ Manual and regression checks:
 - Verify desktop/tablet layouts remain intact.
 - Verify apply/export and validation behavior still match current behavior.
 
-If automated UI tests exist for responsive rendering, add assertions for:
+Add or update automated UI coverage (component/integration/E2E, whichever already exists in this repository) with assertions for:
 
-- Datetime fields are visible and not clipped at mobile breakpoints.
-- Filters card does not overflow horizontally.
+- Datetime fields are visible and not clipped at `320px`, `360px`, and `390px` in portrait orientation.
+- Filters card does not overflow horizontally at the same widths.
 
 ## 8) Acceptance Criteria
 
-- On mobile widths (`<= 390px`), both historical datetime inputs are fully visible within card boundaries.
+- At viewport widths `320px`, `360px`, and `390px` in portrait orientation, both historical datetime inputs are fully visible within card boundaries on iOS Safari and Chromium-based mobile browsers.
 - No clipping or horizontal overflow occurs in the filters card.
-- `HistoricalFiltersForm` filtering behavior remains unchanged.
+- `HistoricalFiltersForm` filtering behavior remains unchanged: `from`/`to`/`type` state updates, current validation messages, and `onApply`/`onExport` invocation conditions remain identical to current behavior.
 - A shared datetime style utility exists and is used by `HistoricalFiltersForm`.
 - Existing desktop behavior is preserved.
 
