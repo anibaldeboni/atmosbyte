@@ -54,6 +54,7 @@ Alternatives considered:
   - right-side padding for icon clearance,
   - right-aligned clickable calendar icon,
   - palette-compliant border, text, and focus styles.
+- The picker popup must render outside clipping containers (portal or fixed-position popper strategy) and use a defined z-index token above cards/modals to prevent mobile clipping when parent containers use overflow constraints.
 - Maintain adaptive layout:
   - small screens: stacked fields,
   - tablet and up: existing multi-column layout behavior.
@@ -65,7 +66,7 @@ Alternatives considered:
 - State contract is explicit: `from` and `to` remain string state in `YYYY-MM-DDTHH:mm` local format.
 - `react-datepicker` `Date | null` values are derived for UI only and converted back to the same local string format on change; do not use `toISOString()` for outbound payloads.
 - Preserve callback payload shape and format exactly as today. Payload contract is normative: `onApply` and `onExport` must receive `{ from, to, type }` where `from` and `to` are serialized as local datetime strings in `YYYY-MM-DDTHH:mm` format (no seconds, no timezone suffix), matching native `datetime-local` output exactly.
-- Both controls must allow date and time selection (not date-only), using normative `react-datepicker` configuration: enable `showTimeSelect` and set time format and interval to match current behavior exactly (same minute granularity and interaction flow).
+- Both controls must allow date and time selection (not date-only), using normative `react-datepicker` configuration: enable `showTimeSelect` with `timeIntervals={1}` (1-minute granularity) to preserve current `datetime-local` behavior and interaction flow.
 - Preserve event paths:
   - `Carregar` -> validate -> `onApply(values)`
   - `Exportar CSV` -> validate -> `onExport(values)`
@@ -81,6 +82,7 @@ Alternatives considered:
 ## 4) Styling and Accessibility
 
 - Use existing frontend palette tokens/classes already used by form controls.
+- Include `react-datepicker` base styles (library CSS import or equivalent local component styles) before palette overrides so calendar structure, spacing, and focus states render correctly across browsers.
 - Ensure icon button is keyboard-focusable and screen-reader compatible.
 - Keep labels (`De`, `Até`) as accessible names for the corresponding controls.
 - Ensure touch target is usable on mobile and does not overlap text content.
