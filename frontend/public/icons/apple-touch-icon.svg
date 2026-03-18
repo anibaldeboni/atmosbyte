@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-labelledby="title desc">
+  <title id="title">Atmosbyte touch icon</title>
+  <desc id="desc">Atmosbyte icon for home screen</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f4a22" />
+      <stop offset="100%" stop-color="#1f8f46" />
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="38" fill="url(#bg)" />
+  <circle cx="90" cy="90" r="42" fill="none" stroke="#d9ffe8" stroke-width="9" opacity="0.45" />
+  <path d="M60 107c-10 0-18-8-18-17 0-10 8-18 18-18 2 0 4 0 6 1 4-11 14-19 27-19 16 0 30 13 30 30v2h2c8 0 15 7 15 15 0 9-7 16-15 16H60Z" fill="#e8fff1" />
+  <path d="M75 113h31" stroke="#14532d" stroke-width="7" stroke-linecap="round" />
+  <path d="M81 129h19" stroke="#14532d" stroke-width="7" stroke-linecap="round" />
+</svg>

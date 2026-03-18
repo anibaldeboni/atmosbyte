@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Atmosbyte app icon</title>
+  <desc id="desc">Green weather glyph with cloud and pulse ring</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f4a22" />
+      <stop offset="100%" stop-color="#1f8f46" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="110" fill="url(#bg)" />
+  <circle cx="256" cy="256" r="126" fill="none" stroke="#d9ffe8" stroke-width="28" opacity="0.45" />
+  <path d="M173 304c-30 0-52-22-52-50s22-50 52-50c4 0 9 1 14 2 11-34 40-57 78-57 47 0 84 37 84 84v6h5c25 0 46 21 46 46s-21 45-46 45H173Z" fill="#e8fff1" />
+  <path d="M210 325h93" stroke="#14532d" stroke-width="22" stroke-linecap="round" />
+  <path d="M229 374h54" stroke="#14532d" stroke-width="22" stroke-linecap="round" />
+</svg>

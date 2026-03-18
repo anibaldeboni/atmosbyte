@@ -169,6 +169,38 @@ func TestServer_ServesEmbeddedAsset(t *testing.T) {
 	}
 }
 
+func TestServer_ServesManifest(t *testing.T) {
+	server := NewServer(t.Context(), &MockSensorProvider{}, testConfig(), queueProvider, &MockMeasurementRepository{})
+	req := httptest.NewRequest(http.MethodGet, "/manifest.json", nil)
+	w := httptest.NewRecorder()
+
+	server.server.Handler.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", w.Code)
+	}
+
+	if !strings.Contains(w.Header().Get("Content-Type"), "json") {
+		t.Fatalf("expected json content type, got %q", w.Header().Get("Content-Type"))
+	}
+}
+
+func TestServer_ServesServiceWorker(t *testing.T) {
+	server := NewServer(t.Context(), &MockSensorProvider{}, testConfig(), queueProvider, &MockMeasurementRepository{})
+	req := httptest.NewRequest(http.MethodGet, "/service-worker.js", nil)
+	w := httptest.NewRecorder()
+
+	server.server.Handler.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", w.Code)
+	}
+
+	if !strings.Contains(w.Header().Get("Content-Type"), "javascript") {
+		t.Fatalf("expected javascript content type, got %q", w.Header().Get("Content-Type"))
+	}
+}
+
 func TestServer_SPAFallbackForNavigationRoutes(t *testing.T) {
 	server := NewServer(t.Context(), &MockSensorProvider{}, testConfig(), queueProvider, &MockMeasurementRepository{})
 	req := httptest.NewRequest(http.MethodGet, "/historical", nil)

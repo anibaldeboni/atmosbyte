@@ -10,6 +10,14 @@ import "./styles.css"
 
 const rootElement = document.getElementById("root")
 
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    void navigator.serviceWorker.register("/service-worker.js").catch((error: unknown) => {
+      console.error("Service worker registration failed", error)
+    })
+  })
+}
+
 if (!rootElement) {
   throw new Error("Root element not found")
 }

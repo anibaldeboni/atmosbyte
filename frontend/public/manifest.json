@@ -1,0 +1,30 @@
+{
+    "name": "Atmosbyte Monitoramento Meteorologico",
+    "short_name": "Atmosbyte",
+    "description": "Acompanhe dados meteorologicos em tempo real e historico.",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#e2e8f0",
+    "theme_color": "#166534",
+    "icons": [
+        {
+            "src": "/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

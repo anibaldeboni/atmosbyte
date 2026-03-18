@@ -1,5 +1,6 @@
 import { MetricsGrid } from "../features/current-metrics/MetricsGrid"
 import { useCurrentMetrics } from "../features/current-metrics/useCurrentMetrics"
+import { PwaInstallCta } from "../features/pwa/PwaInstallCta"
 import { InlineAlert } from "../shared/ui/InlineAlert"
 
 interface HomePageProps {
@@ -16,6 +17,7 @@ export function HomePage({ }: HomePageProps): React.JSX.Element {
           Acompanhe os indicadores meteorológicos mais recentes
         </p>
       </section>
+      <PwaInstallCta />
       {degraded ? (
         <InlineAlert tone="warn">Conexão degradada. Intervalo de polling alterado para {intervalMs / 1000}s.</InlineAlert>
       ) : null}
