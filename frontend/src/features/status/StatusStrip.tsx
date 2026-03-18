@@ -1,6 +1,6 @@
 import { useStatusPolling } from "./useStatusPolling"
 import { Skeleton } from "../../shared/ui/Skeleton"
-import { Toast } from "../../shared/ui/Toast"
+import { Tooltip } from "../../shared/ui/Tooltip"
 
 function dotClass(level: "ok" | "warn" | "error"): string {
   if (level === "error") {
@@ -12,11 +12,26 @@ function dotClass(level: "ok" | "warn" | "error"): string {
   return "status-icon-ok"
 }
 
-function CheckCircleIcon(): React.JSX.Element {
+function ComputerIcon(): React.JSX.Element {
   return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M5.2 8.3 7.1 10.2 10.9 6.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg viewBox="0 0 24 24" fill="none" role="img">
+      <rect x="3" y="4" width="18" height="14" rx="2" ry="2" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M8 20h8M12 16v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function ThermometerIcon(): React.JSX.Element {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" role="img">
+      <path
+        d="M14 14.76V5a2 2 0 1 0-4 0v9.76a4 4 0 1 0 4 0Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M12 11v6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   )
 }
@@ -41,23 +56,30 @@ function QueueListIcon(): React.JSX.Element {
   )
 }
 
-export function StatusStrip(): React.JSX.Element {
-  const { status, loading, error } = useStatusPolling()
-  const updatedAt = new Date(status.updatedAt).toLocaleTimeString("pt-BR", { hour12: false })
-  const hasCommunicationFailure = Boolean(error)
-  const systemLabel =
-    status.level === "error" ? "Sistema indisponivel" : status.level === "warn" ? "Sistema com degradacao" : "Sistema operacional"
-  const sensorLabel =
-    status.sensorLevel === "error" ? "Sensor indisponivel" : status.sensorLevel === "warn" ? "Sensor degradado" : "Sensor conectado"
+function humanStatus(level: string): string {
+  if (level === "error") {
+    return "Indisponível"
+  }
+  if (level === "warn") {
+    return "Degradado"
+  }
+  return "Operacional"
+}
 
-  const toastTone: "warn" | "error" | null = error || status.level === "error" ? "error" : status.queueLevel === "warn" || status.level === "warn" ? "warn" : null
-  const toastMessage = error
-    ? `Ultimo erro: ${error}`
-    : status.level === "error"
-      ? status.message
-      : status.queueLevel === "warn" || status.level === "warn"
-        ? status.message
-        : null
+function fmtDateWithBrowserLocale(dateStr: number): string {
+  const date = new Date(dateStr)
+  const currentBrowserLocale = navigator.language || "en-US"
+  const currentBrowserTimeFormat = new Intl.DateTimeFormat(currentBrowserLocale, { hour: "numeric" }).formatToParts(new Date()).find(part => part.type === "hour")?.value || "24"
+  const hour12 = currentBrowserTimeFormat === "12"
+  return date.toLocaleTimeString(currentBrowserLocale, { hour12 })
+}
+
+export function StatusStrip(): React.JSX.Element {
+  const { status, loading } = useStatusPolling()
+  const updatedLabel = fmtDateWithBrowserLocale(status.updatedAt)
+  const systemLabel = humanStatus(status.level)
+  const sensorLabel = humanStatus(status.sensorLevel)
+  const queueLabel = `Fila: ${status.queueLevel == "error" ? "---" : status.queueSize}${status.retryQueueSize > 0 ? ` (${status.retryQueueSize} tentativas)` : ""}`
 
   if (loading) {
     return (
@@ -75,35 +97,39 @@ export function StatusStrip(): React.JSX.Element {
   return (
     <section className="status-strip border-b-2">
       <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-x-3 gap-y-2 px-4 py-2 text-[15px] md:grid-cols-2 xl:grid-cols-4">
-        <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
-          <span className={`status-item-icon ${dotClass(status.level)}`} aria-hidden="true">
-            <CheckCircleIcon />
-          </span>
-          <span>{systemLabel}</span>
-        </p>
-        <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
-          <span className={`status-item-icon ${dotClass(status.sensorLevel)}`} aria-hidden="true">
-            <CheckCircleIcon />
-          </span>
-          <span>{sensorLabel}</span>
-        </p>
-        <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
-          <span className={`status-item-icon status-icon-clock ${hasCommunicationFailure ? "status-icon-clock-error" : ""}`} aria-hidden="true">
-            <ClockIcon />
-          </span>
-          <span>Última atualização: {updatedAt}</span>
-        </p>
-        <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
-          <span className={`status-item-icon ${dotClass(status.queueLevel)}`} aria-hidden="true">
-            <QueueListIcon />
-          </span>
-          <span>
-            Fila: {status.queueSize}
-            {status.retryQueueSize > 0 ? ` (${status.retryQueueSize} retry)` : ""}
-          </span>
-        </p>
+        <Tooltip as="div" className="w-full" content="Comunicação com a estação meteorológica">
+          <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+            <span className={`status-item-icon ${dotClass(status.level)}`} aria-hidden="true">
+              <ComputerIcon />
+            </span>
+            <span>{systemLabel}</span>
+          </p>
+        </Tooltip>
+        <Tooltip as="div" className="w-full" content="Leitura dos sensores">
+          <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+            <span className={`status-item-icon ${dotClass(status.sensorLevel)}`} aria-hidden="true">
+              <ThermometerIcon />
+            </span>
+            <span>{sensorLabel}</span>
+          </p>
+        </Tooltip>
+        <Tooltip as="div" className="w-full" content="Última atualização">
+          <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+            <span className="status-item-icon status-icon-clock" aria-hidden="true">
+              <ClockIcon />
+            </span>
+            <span>{updatedLabel}</span>
+          </p>
+        </Tooltip>
+        <Tooltip as="div" className="w-full" content="Leituras pendentes na fila de processamento">
+          <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+            <span className={`status-item-icon ${dotClass(status.queueLevel)}`} aria-hidden="true">
+              <QueueListIcon />
+            </span>
+            <span>{queueLabel}</span>
+          </p>
+        </Tooltip>
       </div>
-      {toastTone && toastMessage ? <Toast tone={toastTone} title={toastTone === "error" ? "Erro de status" : "Alerta de status"}>{toastMessage}</Toast> : null}
     </section>
   )
 }
