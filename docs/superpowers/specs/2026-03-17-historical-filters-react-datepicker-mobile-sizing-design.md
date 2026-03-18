@@ -13,6 +13,7 @@ The current implementation uses native browser `datetime-local` inputs, which re
 ## Goals
 
 - Eliminate mobile clipping/truncation for both date-time fields in `HistoricalFiltersForm`.
+- Restore focus and prioritization of the primary filter controls by guaranteeing full legibility and a clear visible focus state on mobile.
 - Refactor from native `datetime-local` to `react-datepicker`.
 - Keep date + time selection behavior.
 - Add a right-aligned calendar icon in each input, clickable to focus/open the picker.
@@ -61,7 +62,8 @@ Alternatives considered:
 
 - Keep existing defaults: `from = now - 24h`, `to = now`.
 - Continue first-render auto-load behavior via `onApply(values)` once.
-- Convert `react-datepicker` `Date` values to the existing form state format used by apply/export callbacks.
+- Preserve callback payload shape and format exactly as today: `onApply` and `onExport` continue receiving `{ from, to, type }` with `from` and `to` serialized in the same string format currently produced by the native inputs; no API contract change.
+- Both controls must allow date and time selection (not date-only), using `react-datepicker` configuration that exposes time selection and keeps existing effective granularity and interaction flow.
 - Preserve event paths:
   - `Carregar` -> validate -> `onApply(values)`
   - `Exportar CSV` -> validate -> `onExport(values)`
@@ -84,11 +86,12 @@ Alternatives considered:
 ## Acceptance Criteria
 
 1. On common mobile widths, neither date-time field is clipped or truncated in the historical filters card.
-2. Both fields support selecting date + time via `react-datepicker`.
-3. Each field shows a right-aligned calendar icon that is clickable/tappable and opens/focuses the picker.
-4. Existing validation behavior and error messages remain intact.
-5. `Carregar` and `Exportar CSV` continue using the same validated values contract.
-6. Visual styling matches the existing frontend palette and nearby controls.
+2. At 320px, 360px, and 390px widths, both date fields are fully visible on initial render and expose a visible focus ring when keyboard-focused (no clipping, no overlap, no hidden interactive affordance).
+3. Both fields support selecting date + time via `react-datepicker` without losing current interaction flow.
+4. Each field shows a right-aligned calendar icon that is clickable/tappable and opens/focuses the picker.
+5. Existing validation behavior and error messages remain intact.
+6. `Carregar` and `Exportar CSV` continue using the same validated values contract and payload format as before the migration.
+7. Visual styling matches the existing frontend palette and nearby controls.
 
 ## Test Plan
 
@@ -99,6 +102,11 @@ Alternatives considered:
 - Functional checks:
   - valid range applies/exports,
   - invalid range blocks action and shows error.
+- Automated checks:
+  - unchanged validation behavior for valid and invalid ranges,
+  - no auto-swap on invalid range,
+  - callback payload format parity before and after migration,
+  - icon click opens/focuses the picker.
 - Regression checks on tablet/desktop:
   - adaptive layout remains stable,
   - initial auto-load behavior unchanged.
