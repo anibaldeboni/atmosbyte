@@ -68,7 +68,7 @@ export function MetricsGrid({ data, loading }: MetricsGridProps): React.JSX.Elem
     <div className="grid gap-4 md:grid-cols-3">
       <MetricCard
         label="Temperatura"
-        value={formatValue(data.temperature, "C")}
+        value={formatValue(data.temperature, "°C")}
         helper={`Fonte: ${data.source}`}
         icon={<TemperatureIcon />}
       />
