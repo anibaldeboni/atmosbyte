@@ -62,8 +62,10 @@ Alternatives considered:
 
 - Keep existing defaults: `from = now - 24h`, `to = now`.
 - Continue first-render auto-load behavior via `onApply(values)` once.
+- State contract is explicit: `from` and `to` remain string state in `YYYY-MM-DDTHH:mm` local format.
+- `react-datepicker` `Date | null` values are derived for UI only and converted back to the same local string format on change; do not use `toISOString()` for outbound payloads.
 - Preserve callback payload shape and format exactly as today. Payload contract is normative: `onApply` and `onExport` must receive `{ from, to, type }` where `from` and `to` are serialized as local datetime strings in `YYYY-MM-DDTHH:mm` format (no seconds, no timezone suffix), matching native `datetime-local` output exactly.
-- Both controls must allow date and time selection (not date-only), using `react-datepicker` configuration that exposes time selection and keeps existing effective granularity and interaction flow.
+- Both controls must allow date and time selection (not date-only), using normative `react-datepicker` configuration: enable `showTimeSelect` and set time format and interval to match current behavior exactly (same minute granularity and interaction flow).
 - Preserve event paths:
   - `Carregar` -> validate -> `onApply(values)`
   - `Exportar CSV` -> validate -> `onExport(values)`
@@ -100,6 +102,7 @@ Alternatives considered:
   - no clipping,
   - icon alignment/tap behavior,
   - readable values.
+- Manual browser verification must include iOS Safari and Android Chrome at 320px, 360px, and 390px widths, validating that both inputs and the opened picker UI are fully visible, tappable, and not clipped by card/container overflow.
 - Functional checks:
   - valid range applies/exports,
   - invalid range blocks action and shows error.
