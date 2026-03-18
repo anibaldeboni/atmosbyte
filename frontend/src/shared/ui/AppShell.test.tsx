@@ -29,14 +29,16 @@ beforeEach(() => {
   document.documentElement.dataset.theme = "light"
 })
 
-test("theme toggle renders before first nav link", () => {
+test("theme toggle renders inside primary navigation", () => {
   renderShell()
 
   const nav = screen.getByRole("navigation", { name: "Primary" })
   const toggle = within(nav).getByRole("button")
-  const firstLink = within(nav).getByRole("link", { name: "Início" })
+  const links = within(nav).getAllByRole("link")
 
-  expect(firstLink.previousElementSibling).toBe(toggle)
+  expect(links).toHaveLength(2)
+  expect(nav.contains(toggle)).toBe(true)
+  expect(nav.lastElementChild).toBe(toggle)
 })
 
 test("theme toggle updates aria-label and aria-pressed", async () => {
@@ -56,7 +58,8 @@ test("theme toggle can be activated by keyboard", async () => {
   const user = userEvent.setup()
   renderShell()
 
-  await user.tab()
+  const toggle = screen.getByRole("button", { name: "Ativar modo escuro" })
+  toggle.focus()
   await user.keyboard("{Enter}")
 
   expect(screen.getByRole("button", { name: "Ativar modo claro" })).toBeInTheDocument()

@@ -1,7 +1,41 @@
+import React from "react"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 
 import { client } from "../../shared/api/client"
 import { HistoricalPage } from "../../pages/HistoricalPage"
+
+jest.mock("react-datepicker", () => {
+  return function MockDatePicker(props: {
+    selected?: Date | null
+    onChange?: (date: Date | null) => void
+    customInput: React.ReactElement<{ onClick?: () => void; value?: string }>
+    onInputClick?: () => void
+    open?: boolean
+  }) {
+    const value = props.selected instanceof Date && !Number.isNaN(props.selected.getTime())
+      ? `${props.selected.getFullYear()}-${String(props.selected.getMonth() + 1).padStart(2, "0")}-${String(props.selected.getDate()).padStart(2, "0")}T${String(props.selected.getHours()).padStart(2, "0")}:${String(props.selected.getMinutes()).padStart(2, "0")}`
+      : ""
+
+    const input = props.customInput
+    const mergedOnClick = () => {
+      props.onInputClick?.()
+      input.props.onClick?.()
+    }
+
+    return (
+      <>
+        {React.cloneElement(input, {
+          value,
+          onClick: mergedOnClick,
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            props.onChange?.(new Date(event.target.value))
+          },
+        })}
+        {props.open ? <div className="react-datepicker" data-testid="datepicker-popup" /> : null}
+      </>
+    )
+  }
+})
 
 jest.mock("../../shared/api/client", () => ({
   client: {
@@ -65,6 +99,11 @@ test("serializes query and preserves prior chart data on error", async () => {
     expect(mockedClient.getHistorical).toHaveBeenCalledTimes(1)
   })
 
+  const firstQuery = mockedClient.getHistorical.mock.calls[0][0]
+  expect(firstQuery.from).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00.000Z$/)
+  expect(firstQuery.to).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00.000Z$/)
+  expect(firstQuery.type).toMatch(/^(m|h|d)$/)
+
   fireEvent.click(screen.getByRole("button", { name: "Carregar" }))
 
   await waitFor(() => {
@@ -89,6 +128,34 @@ test("exports CSV with current filters", async () => {
   expect(firstCall).toContain("from=")
   expect(firstCall).toContain("to=")
   expect(firstCall).toContain("type=")
+  const parsed = new URL(firstCall, "http://localhost")
+  expect(parsed.searchParams.get("from")).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00.000Z$/)
+  expect(parsed.searchParams.get("to")).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00.000Z$/)
+})
+
+test("renders clickable right-side calendar icons for both datetime fields", async () => {
+  mockedClient.getHistorical.mockResolvedValue([])
+  render(<HistoricalPage />)
+
+  await waitFor(() => {
+    expect(mockedClient.getHistorical).toHaveBeenCalledTimes(1)
+  })
+
+  expect(screen.getByRole("button", { name: "Abrir calendário De" })).toBeInTheDocument()
+  expect(screen.getByRole("button", { name: "Abrir calendário Até" })).toBeInTheDocument()
+})
+
+test("opens picker when calendar icon is clicked", async () => {
+  mockedClient.getHistorical.mockResolvedValue([])
+  render(<HistoricalPage />)
+
+  await waitFor(() => {
+    expect(mockedClient.getHistorical).toHaveBeenCalledTimes(1)
+  })
+
+  fireEvent.click(screen.getByRole("button", { name: "Abrir calendário De" }))
+
+  expect(screen.getByTestId("datepicker-popup")).toBeInTheDocument()
 })
 
 test("auto loads historical data on page mount", async () => {

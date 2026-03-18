@@ -5,6 +5,7 @@ import { RouterProvider } from "react-router-dom"
 import { AppProviders } from "./app/AppProviders"
 import { router } from "./app/router"
 import { Skeleton } from "./shared/ui/Skeleton"
+import "react-datepicker/dist/react-datepicker.css"
 import "./styles.css"
 
 const rootElement = document.getElementById("root")

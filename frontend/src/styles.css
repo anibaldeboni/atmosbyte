@@ -47,6 +47,11 @@
   --historical-field-border: #cbd5e1;
   --historical-field-text: #111827;
   --historical-field-focus: rgba(15, 116, 49, 0.35);
+  --historical-datepicker-surface: #ffffff;
+  --historical-datepicker-header: #f8fafc;
+  --historical-datepicker-muted: #64748b;
+  --historical-datepicker-active-bg: #166534;
+  --historical-datepicker-active-text: #ecfdf5;
   --chart-axis-text: #475467;
   --chart-axis-line: #cbd5e1;
   --chart-grid-stroke: #e2e8f0;
@@ -128,6 +133,11 @@
   --historical-field-border: #3a4c6b;
   --historical-field-text: #eef4ff;
   --historical-field-focus: rgba(48, 223, 216, 0.38);
+  --historical-datepicker-surface: #171f31;
+  --historical-datepicker-header: #1e2a40;
+  --historical-datepicker-muted: #97a8c3;
+  --historical-datepicker-active-bg: #2f8659;
+  --historical-datepicker-active-text: #e9fff1;
   --chart-axis-text: #7f8eab;
   --chart-axis-line: #3a4a67;
   --chart-grid-stroke: #33435f;
@@ -380,6 +390,18 @@ body {
   color: var(--historical-field-label);
 }
 
+.historical-field-row {
+  display: grid;
+  align-items: center;
+  gap: 0.5rem;
+  grid-template-columns: 1fr;
+}
+
+.historical-inline-control {
+  margin-top: 0;
+  width: 100%;
+}
+
 .historical-field-control {
   background-color: var(--historical-field-bg);
   border-color: var(--historical-field-border);
@@ -389,6 +411,118 @@ body {
 .historical-field-control:focus-visible {
   outline: 2px solid var(--historical-field-focus);
   outline-offset: 1px;
+}
+
+.historical-datepicker-input-wrap {
+  position: relative;
+}
+
+.historical-datepicker-input {
+  padding-right: 2.75rem;
+}
+
+.historical-datepicker-icon {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  display: inline-flex;
+  height: 1.75rem;
+  width: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-50%);
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--historical-field-label);
+}
+
+.historical-datepicker-icon:hover {
+  background-color: color-mix(in srgb, var(--historical-field-border) 25%, transparent);
+}
+
+.historical-datepicker-icon:focus-visible {
+  outline: 2px solid var(--historical-field-focus);
+  outline-offset: 1px;
+}
+
+.historical-datepicker-icon svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.react-datepicker-popper {
+  z-index: 40;
+}
+
+.react-datepicker {
+  border-color: var(--historical-field-border);
+  background-color: var(--historical-datepicker-surface);
+  color: var(--historical-field-text);
+  font-family: inherit;
+}
+
+.react-datepicker__header {
+  border-bottom-color: var(--historical-field-border);
+  background-color: var(--historical-datepicker-header);
+}
+
+.react-datepicker__current-month,
+.react-datepicker-time__header,
+.react-datepicker__day-name,
+.react-datepicker__time-name {
+  color: var(--historical-field-text);
+}
+
+.react-datepicker__day,
+.react-datepicker__time-list-item,
+.react-datepicker__day--keyboard-selected,
+.react-datepicker__day--outside-month,
+.react-datepicker__navigation-icon::before {
+  color: var(--historical-field-text);
+}
+
+.react-datepicker__day:hover,
+.react-datepicker__time-list-item:hover {
+  background-color: color-mix(in srgb, var(--historical-field-border) 24%, transparent);
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__time-list-item--selected {
+  background-color: var(--historical-datepicker-active-bg) !important;
+  color: var(--historical-datepicker-active-text) !important;
+}
+
+.react-datepicker__day--disabled,
+.react-datepicker__time-list-item--disabled,
+.react-datepicker__day--outside-month {
+  color: var(--historical-datepicker-muted);
+}
+
+.react-datepicker__time-container,
+.react-datepicker__time,
+.react-datepicker__time-box,
+.react-datepicker__time-list {
+  border-left-color: var(--historical-field-border) !important;
+  background-color: var(--historical-datepicker-surface);
+}
+
+@media (max-width: 767px) {
+  .historical-field-row {
+    grid-template-columns: auto minmax(0, 1fr);
+    justify-items: end;
+    column-gap: 0.75rem;
+  }
+
+  .historical-field-row > .historical-datepicker-input-wrap,
+  .historical-field-row > .historical-inline-control {
+    width: min(100%, 28rem);
+    margin-top: 0;
+  }
+
+  .historical-field-row > .historical-inline-control {
+    text-align: left;
+  }
 }
 
 .historical-chart-legend {
