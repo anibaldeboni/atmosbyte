@@ -37,7 +37,6 @@ help: ## Show this help message
 	@echo "  test               Run tests"
 	@echo "  run                Build frontend and run app"
 	@echo "  build              Build binary for target platform (development)"
-	@echo "  build-prod         Build binary for production"
 	@echo "  build-rpi          Build for Raspberry Pi (ARM64)"
 	@echo "  frontend-install   Install frontend dependencies"
 	@echo "  frontend-build     Build frontend SPA bundle"
@@ -49,15 +48,10 @@ help: ## Show this help message
 	@echo "$(YELLOW)Raspberry Pi deployment:$(RESET)"
 	@echo "  build-rpi          Build binary for Raspberry Pi"
 	@echo "  package-rpi        Create deployment package"
-	@echo "  install-service    Install systemd service (run on Pi)"
-	@echo "  uninstall-service  Remove systemd service"
-	@echo "  service-status     Check service status"
-	@echo "  service-logs       View service logs"
 	@echo ""
 	@echo "$(YELLOW)Development workflow:$(RESET)"
 	@echo "  make run                      # Build frontend and run locally"
 	@echo "  make build                    # Build binary for current platform"
-	@echo "  make build-prod               # Build production binary"
 	@echo ""
 	@echo "$(YELLOW)Build examples:$(RESET)"
 	@echo "  make build                    # Build for current platform"
@@ -124,17 +118,6 @@ build: $(BUILD_DIR) fmt frontend-sync ## Build binary for target platform
 	@echo "$(GREEN)✓ Build completed: $(BINARY_PATH)$(RESET)"
 	@ls -lh $(BINARY_PATH)
 
-.PHONY: build-prod
-build-prod: $(BUILD_DIR) fmt frontend-sync ## Build production binary
-	@echo "$(YELLOW)Building $(PROJECT_NAME) for $(GOOS)/$(GOARCH) (production)...$(RESET)"
-	@mkdir -p $(dir $(BINARY_PATH))
-	@GOOS=$(GOOS) GOARCH=$(GOARCH) go build \
-		-ldflags "$(LDFLAGS)" \
-		-o $(BINARY_PATH) \
-		$(MAIN_FILE)
-	@echo "$(GREEN)✓ Production build completed: $(BINARY_PATH)$(RESET)"
-	@ls -lh $(BINARY_PATH)
-
 .PHONY: info
 info: ## Show build information
 	@echo "$(CYAN)Build Information:$(RESET)"
@@ -157,43 +140,6 @@ build-rpi: $(BUILD_DIR) fmt frontend-sync ## Build binary for Raspberry Pi (ARM6
 	@echo "$(GREEN)✓ Raspberry Pi binary built successfully$(RESET)"
 	@echo "  Binary: $(BUILD_DIR)/linux-arm64/$(PROJECT_NAME)"
 	@file $(BUILD_DIR)/linux-arm64/$(PROJECT_NAME)
-
-.PHONY: install-service
-install-service: build-rpi ## Build and install systemd service on Raspberry Pi
-	@echo "$(YELLOW)Installing atmosbyte systemd service...$(RESET)"
-	@chmod +x install-service.sh
-	@if [ "$(shell uname -m)" = "aarch64" ]; then \
-		echo "$(GREEN)Running on ARM64 system, installing service...$(RESET)"; \
-		sudo ./install-service.sh; \
-	else \
-		echo "$(RED)This target should be run on the Raspberry Pi$(RESET)"; \
-		echo "$(YELLOW)Copy the following files to your Raspberry Pi and run:$(RESET)"; \
-		echo "  - $(BUILD_DIR)/linux-arm64/$(PROJECT_NAME)"; \
-		echo "  - atmosbyte.service"; \
-		echo "  - install-service.sh"; \
-		echo "  - atmosbyte.yaml (or atmosbyte.yaml.example)"; \
-		echo "$(YELLOW)Then run: sudo ./install-service.sh$(RESET)"; \
-	fi
-
-.PHONY: uninstall-service
-uninstall-service: ## Uninstall systemd service
-	@echo "$(YELLOW)Uninstalling atmosbyte service...$(RESET)"
-	@sudo systemctl stop atmosbyte || true
-	@sudo systemctl disable atmosbyte || true
-	@sudo rm -f /etc/systemd/system/atmosbyte.service
-	@sudo systemctl daemon-reload
-	@sudo rm -rf /opt/atmosbyte
-	@echo "$(GREEN)✓ Service uninstalled$(RESET)"
-
-.PHONY: service-status
-service-status: ## Check service status
-	@echo "$(CYAN)Atmosbyte Service Status:$(RESET)"
-	@sudo systemctl status atmosbyte --no-pager -l || true
-
-.PHONY: service-logs
-service-logs: ## View service logs
-	@echo "$(CYAN)Atmosbyte Service Logs:$(RESET)"
-	@sudo journalctl -u atmosbyte -f
 
 .PHONY: package-rpi
 package-rpi: build-rpi ## Create deployment package for Raspberry Pi
