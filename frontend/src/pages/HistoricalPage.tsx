@@ -50,7 +50,7 @@ export function HistoricalPage({ }: HistoricalPageProps): React.JSX.Element {
   return (
     <div className="space-y-6">
       <section>
-        <h2 className="page-heading text-[42px] font-extrabold tracking-[-0.02em]">Análise do Histórico Meteorológico</h2>
+        <h2 className="page-heading text-[42px] font-extrabold tracking-[-0.02em]">Histórico meteorológico</h2>
         <p className="page-subheading mt-1 text-[18px]">Visualização de dados meteorológicos históricos</p>
       </section>
       <HistoricalFiltersForm onApply={handlers.onApply} onExport={handlers.onExport} />
