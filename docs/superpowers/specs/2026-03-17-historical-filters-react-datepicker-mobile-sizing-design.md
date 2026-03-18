@@ -62,7 +62,7 @@ Alternatives considered:
 
 - Keep existing defaults: `from = now - 24h`, `to = now`.
 - Continue first-render auto-load behavior via `onApply(values)` once.
-- Preserve callback payload shape and format exactly as today: `onApply` and `onExport` continue receiving `{ from, to, type }` with `from` and `to` serialized in the same string format currently produced by the native inputs; no API contract change.
+- Preserve callback payload shape and format exactly as today. Payload contract is normative: `onApply` and `onExport` must receive `{ from, to, type }` where `from` and `to` are serialized as local datetime strings in `YYYY-MM-DDTHH:mm` format (no seconds, no timezone suffix), matching native `datetime-local` output exactly.
 - Both controls must allow date and time selection (not date-only), using `react-datepicker` configuration that exposes time selection and keeps existing effective granularity and interaction flow.
 - Preserve event paths:
   - `Carregar` -> validate -> `onApply(values)`
@@ -92,6 +92,7 @@ Alternatives considered:
 5. Existing validation behavior and error messages remain intact.
 6. `Carregar` and `Exportar CSV` continue using the same validated values contract and payload format as before the migration.
 7. Visual styling matches the existing frontend palette and nearby controls.
+8. At viewport widths below `768px`, `De` and `Até` render as stacked full-width rows; at `768px` and above, they render side-by-side in the existing multi-column layout, with no clipping or overflow in either mode.
 
 ## Test Plan
 
