@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react"
 
-import { client } from "../../shared/api/client"
+import { ApiError, client } from "../../shared/api/client"
 import { HomePage } from "../../pages/HomePage"
 import { useCurrentMetrics } from "./useCurrentMetrics"
 
@@ -10,7 +10,7 @@ jest.mock("../../shared/api/client", () => ({
     getHealth: jest.fn(),
     getQueue: jest.fn(),
   },
-  ApiError: class extends Error {},
+  ApiError: class extends Error { },
 }))
 
 const mockedClient = client as jest.Mocked<typeof client>
@@ -57,7 +57,7 @@ test("loading to success replaces skeleton", async () => {
 
   await waitFor(() => {
     expect(screen.getByText("25.0")).toBeInTheDocument()
-    expect(screen.getByText("C")).toBeInTheDocument()
+    expect(screen.getByText("°C")).toBeInTheDocument()
   })
 })
 
@@ -71,7 +71,7 @@ test("retains last successful values during transient errors", async () => {
       source: "BME280",
     },
     loading: false,
-    error: "network",
+    error: new ApiError("network"),
     degraded: false,
     intervalMs: 30000,
   })
@@ -79,7 +79,7 @@ test("retains last successful values during transient errors", async () => {
   render(<HomePage />)
 
   expect(screen.getByText("21.0")).toBeInTheDocument()
-  expect(screen.getByText("C")).toBeInTheDocument()
+  expect(screen.getByText("°C")).toBeInTheDocument()
   expect(screen.getByText("network")).toBeInTheDocument()
 })
 
@@ -116,7 +116,7 @@ test("shows degraded notice and 60s interval after 3 failed cycles then recovers
 
   await waitFor(() => {
     expect(screen.getByText("20.0")).toBeInTheDocument()
-    expect(screen.getByText("C")).toBeInTheDocument()
+    expect(screen.getByText("°C")).toBeInTheDocument()
     expect(screen.getByText(/Conexão degradada/)).toBeInTheDocument()
     expect(screen.getByText(/60s/)).toBeInTheDocument()
   })
@@ -126,6 +126,6 @@ test("shows degraded notice and 60s interval after 3 failed cycles then recovers
   await waitFor(() => {
     expect(screen.queryByText(/Conexão degradada/)).not.toBeInTheDocument()
     expect(screen.getByText("22.0")).toBeInTheDocument()
-    expect(screen.getByText("C")).toBeInTheDocument()
+    expect(screen.getByText("°C")).toBeInTheDocument()
   })
 })

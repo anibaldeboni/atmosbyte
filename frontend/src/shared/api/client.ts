@@ -38,7 +38,7 @@ function readNumber(obj: Record<string, unknown>, key: string): number | null {
 
 function parseMeasurement(payload: unknown): MeasurementDto {
   if (!isRecord(payload)) {
-    throw new ApiError("parse", "measurement payload must be an object")
+    throw new ApiError("parse", "A resposta do endpoint /measurements tem um formato inesperado")
   }
 
   const timestamp = readString(payload, "timestamp")
@@ -48,7 +48,7 @@ function parseMeasurement(payload: unknown): MeasurementDto {
   const source = readString(payload, "source")
 
   if (!timestamp || temperature === null || humidity === null || pressure === null || !source) {
-    throw new ApiError("parse", "measurement payload has invalid shape")
+    throw new ApiError("parse", "A resposta do endpoint /measurements tem um formato inesperado")
   }
 
   return { timestamp, temperature, humidity, pressure, source }
@@ -56,7 +56,7 @@ function parseMeasurement(payload: unknown): MeasurementDto {
 
 function parseHealth(payload: unknown): HealthDto {
   if (!isRecord(payload)) {
-    throw new ApiError("parse", "health payload must be an object")
+    throw new ApiError("parse", "A resposta do endpoint /health tem um formato inesperado")
   }
 
   const status = readString(payload, "status")
@@ -64,7 +64,7 @@ function parseHealth(payload: unknown): HealthDto {
   const sensor = readString(payload, "sensor")
 
   if (!status || !timestamp || !sensor) {
-    throw new ApiError("parse", "health payload has invalid shape")
+    throw new ApiError("parse", "A resposta do endpoint /health tem um formato inesperado")
   }
 
   return { status, timestamp, sensor }
@@ -72,7 +72,7 @@ function parseHealth(payload: unknown): HealthDto {
 
 function parseQueue(payload: unknown): QueueStatsDto {
   if (!isRecord(payload)) {
-    throw new ApiError("parse", "queue payload must be an object")
+    throw new ApiError("parse", "A resposta do endpoint /queue tem um formato inesperado")
   }
 
   const queue_size = readNumber(payload, "queue_size")
@@ -82,7 +82,7 @@ function parseQueue(payload: unknown): QueueStatsDto {
   const timestamp = readString(payload, "timestamp")
 
   if (queue_size === null || retry_queue_size === null || circuit_breaker_state === null || workers === null || !timestamp) {
-    throw new ApiError("parse", "queue payload has invalid shape")
+    throw new ApiError("parse", "A resposta do endpoint /queue tem um formato inesperado")
   }
 
   return { queue_size, retry_queue_size, circuit_breaker_state, workers, timestamp }
@@ -90,7 +90,7 @@ function parseQueue(payload: unknown): QueueStatsDto {
 
 function parseAggregateValue(payload: unknown): { min?: number; max?: number; average?: number } {
   if (!isRecord(payload)) {
-    throw new ApiError("parse", "aggregate value payload must be an object")
+    throw new ApiError("parse", "A resposta do endpoint /historical tem um formato inesperado")
   }
 
   const min = readNumber(payload, "min")
@@ -112,12 +112,12 @@ function parseAggregateValue(payload: unknown): { min?: number; max?: number; av
 
 function parseHistorical(payload: unknown): AggregateMeasurementDto[] {
   if (!Array.isArray(payload)) {
-    throw new ApiError("parse", "historical payload must be an array")
+    throw new ApiError("parse", "A resposta do endpoint /historical deve ser um array")
   }
 
   return payload.map((item) => {
     if (!isRecord(item)) {
-      throw new ApiError("parse", "historical item must be an object")
+      throw new ApiError("parse", "A resposta do endpoint /historical contém um item inválido")
     }
 
     const type = readString(item, "type")
@@ -127,7 +127,7 @@ function parseHistorical(payload: unknown): AggregateMeasurementDto[] {
     const pressureRaw = item.pressure
 
     if ((type !== "minute" && type !== "hour" && type !== "day") || date === null) {
-      throw new ApiError("parse", "historical item has invalid metadata")
+      throw new ApiError("parse", "A resposta do endpoint /historical contém metadados inválidos")
     }
 
     return {
@@ -161,7 +161,7 @@ async function safeParseError(res: Response): Promise<ErrorResponseDto | null> {
   }
 }
 
-async function request(path: string, timeoutMs: number): Promise<unknown> {
+async function request<T>(path: string, timeoutMs: number): Promise<T> {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), timeoutMs)
 
@@ -175,22 +175,31 @@ async function request(path: string, timeoutMs: number): Promise<unknown> {
     if (!response.ok) {
       const parsedError = await safeParseError(response)
       const details = parsedError ? parsedError.error : response.statusText
-      throw new ApiError("http", `HTTP ${response.status}`, response.status, details)
+      switch (response.status) {
+        case 400:
+          throw new ApiError("http", `Requisição inválida: ${details}`, response.status, details)
+        case 404:
+          throw new ApiError("http", `Recurso não encontrado: ${path}`, response.status, details)
+        case 500:
+          throw new ApiError("http", `Erro interno do servidor: ${details}`, response.status, details)
+        default:
+          throw new ApiError("http", `HTTP ${response.status}: ${details}`, response.status, details)
+      }
     }
 
     try {
-      return (await response.json()) as unknown
+      return (await response.json()) as T
     } catch {
-      throw new ApiError("parse", "response is not valid JSON")
+      throw new ApiError("parse", "A resposta não é um JSON válido")
     }
   } catch (error: unknown) {
     if (error instanceof ApiError) {
       throw error
     }
     if (error instanceof DOMException && error.name === "AbortError") {
-      throw new ApiError("timeout", "request timed out")
+      throw new ApiError("timeout", "A requisição excedeu o tempo limite")
     }
-    throw new ApiError("network", "network request failed")
+    throw new ApiError("network", "Falha na requisição de rede")
   } finally {
     clearTimeout(timeout)
   }
@@ -198,17 +207,17 @@ async function request(path: string, timeoutMs: number): Promise<unknown> {
 
 export const client = {
   async getMeasurements(timeoutMs = 8000): Promise<MeasurementDto> {
-    const payload = await request("/measurements", timeoutMs)
+    const payload = await request<MeasurementDto>("/measurements", timeoutMs)
     return parseMeasurement(payload)
   },
 
   async getHealth(timeoutMs = 8000): Promise<HealthDto> {
-    const payload = await request("/health", timeoutMs)
+    const payload = await request<HealthDto>("/health", timeoutMs)
     return parseHealth(payload)
   },
 
   async getQueue(timeoutMs = 8000): Promise<QueueStatsDto> {
-    const payload = await request("/queue", timeoutMs)
+    const payload = await request<QueueStatsDto>("/queue", timeoutMs)
     return parseQueue(payload)
   },
 

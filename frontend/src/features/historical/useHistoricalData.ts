@@ -6,26 +6,23 @@ import type { AggregateMeasurementDto, HistoricalQuery } from "../../shared/type
 export interface HistoricalDataState {
   data: AggregateMeasurementDto[]
   loading: boolean
-  error: string | null
+  error: ApiError | null
   load: (query: HistoricalQuery) => Promise<void>
 }
 
 export function useHistoricalData(initialData: AggregateMeasurementDto[] = []): HistoricalDataState {
   const [data, setData] = useState<AggregateMeasurementDto[]>(initialData)
   const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<ApiError | null>(null)
 
   const load = useCallback(async (query: HistoricalQuery) => {
     setLoading(true)
     try {
       const next = await client.getHistorical(query)
-      if (!Array.isArray(next)) {
-        throw new Error("Invalid historical payload")
-      }
       setData(next)
       setError(null)
     } catch (unknownError: unknown) {
-      setError(unknownError instanceof ApiError ? unknownError.message : "Failed to load historical data")
+      setError(unknownError instanceof ApiError ? unknownError : new ApiError("network", "Não foi possível carregar os dados históricos"))
     } finally {
       setLoading(false)
     }

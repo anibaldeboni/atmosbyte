@@ -4,6 +4,16 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { client } from "../../shared/api/client"
 import { HistoricalPage } from "../../pages/HistoricalPage"
 
+jest.mock("../../features/historical/HistoricalCharts", () => ({
+  HistoricalCharts: ({ data, error, loading }: { data: Array<unknown>; error: Error | null; loading: boolean }) => (
+    <div data-testid="historical-charts-mock">
+      <span>{loading ? "loading" : "ready"}</span>
+      <span>{`count:${data.length}`}</span>
+      {error ? <span>{error.message}</span> : null}
+    </div>
+  ),
+}))
+
 jest.mock("react-datepicker", () => {
   return function MockDatePicker(props: {
     selected?: Date | null
@@ -43,7 +53,7 @@ jest.mock("../../shared/api/client", () => ({
     getHealth: jest.fn(),
     getQueue: jest.fn(),
   },
-  ApiError: class extends Error {},
+  ApiError: class extends Error { },
 }))
 
 const mockedClient = client as jest.Mocked<typeof client>

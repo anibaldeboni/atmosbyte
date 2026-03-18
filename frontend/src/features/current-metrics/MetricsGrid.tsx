@@ -1,6 +1,7 @@
 import type { MeasurementDto } from "../../shared/types/api"
 import { MetricCard } from "../../shared/ui/MetricCard"
 import { Skeleton } from "../../shared/ui/Skeleton"
+import { EmptyState } from "../../shared/ui/EmptyState"
 
 function TemperatureIcon(): React.JSX.Element {
   return (
@@ -61,7 +62,10 @@ export function MetricsGrid({ data, loading }: MetricsGridProps): React.JSX.Elem
   }
 
   if (!data) {
-    return <p className="metric-empty-text text-sm">Dados meteorológicos indisponíveis.</p>
+
+    return (
+      <EmptyState title="Dados meteorológicos indisponíveis." description="Tente atualizar a página." />
+    )
   }
 
   return (

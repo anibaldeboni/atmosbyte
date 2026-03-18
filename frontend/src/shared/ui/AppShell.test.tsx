@@ -5,9 +5,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { ThemeProvider } from "../../app/theme/ThemeProvider"
 import { AppShell } from "./AppShell"
 
-jest.mock("../../features/status/StatusStrip", () => ({
-  StatusStrip: () => <div data-testid="status-strip" />,
-}))
+jest.mock("../../features/status/StatusStrip")
 
 function renderShell(): void {
   render(

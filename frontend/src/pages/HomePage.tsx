@@ -19,7 +19,7 @@ export function HomePage({ }: HomePageProps): React.JSX.Element {
       {degraded ? (
         <InlineAlert tone="warn">Conexão degradada. Intervalo de polling alterado para {intervalMs / 1000}s.</InlineAlert>
       ) : null}
-      {error ? <InlineAlert tone="error">{error}</InlineAlert> : null}
+      {error ? <InlineAlert tone="error">{error.message}</InlineAlert> : null}
       <MetricsGrid data={data} loading={loading} />
     </div>
   )

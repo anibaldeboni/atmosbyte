@@ -5,11 +5,12 @@ import { ChartCard } from "../../shared/ui/ChartCard"
 import { EmptyState } from "../../shared/ui/EmptyState"
 import { InlineAlert } from "../../shared/ui/InlineAlert"
 import { Skeleton } from "../../shared/ui/Skeleton"
+import { ApiError } from "shared/api/client"
 
 interface HistoricalChartsProps {
   data: AggregateMeasurementDto[]
   loading: boolean
-  error: string | null
+  error: ApiError | null
 }
 
 interface ChartPoint {
@@ -184,6 +185,15 @@ export function HistoricalCharts({ data, loading, error }: HistoricalChartsProps
     )
   }
 
+  if (error) {
+    return (
+      <div className="grid gap-4">
+        <InlineAlert tone="error">{error.message}</InlineAlert>
+        <EmptyState title="Falha ao obter dados" description="Tente novamente mais tarde." />
+      </div>
+    )
+  }
+
   if (!loading && data.length === 0 && !error) {
     return <EmptyState title="Nenhum registro histórico" description="Tente expandir o intervalo de datas selecionado." />
   }
@@ -192,7 +202,6 @@ export function HistoricalCharts({ data, loading, error }: HistoricalChartsProps
 
   return (
     <div className="grid gap-4">
-      {error ? <InlineAlert tone="error">{error}</InlineAlert> : null}
       <ChartCard title="Temperatura do ar (°C)" subtitle="Variação térmica no período selecionado" legend={<ChartLegend />}>
         <MetricsLineChart data={chartData} minKey="tempMin" avgKey="tempAvg" maxKey="tempMax" />
       </ChartCard>

@@ -5,6 +5,7 @@ import { EmptyState } from "./EmptyState"
 import { InlineAlert } from "./InlineAlert"
 import { MetricCard } from "./MetricCard"
 import { Toast } from "./Toast"
+import { Tooltip } from "./Tooltip"
 
 test("metric card renders label and value", () => {
   render(<MetricCard label="Temperature" value="20 C" helper="source" icon={<svg data-testid="metric-icon" />} />)
@@ -88,4 +89,26 @@ test("toast pauses auto-dismiss while hovered", () => {
   expect(alert.parentElement).toHaveClass("opacity-0")
 
   jest.useRealTimers()
+})
+
+test("tooltip renders wrapper and tooltip content", () => {
+  render(
+    <Tooltip content="Detalhes">
+      <span>item</span>
+    </Tooltip>,
+  )
+
+  expect(screen.getByText("item")).toBeInTheDocument()
+  expect(screen.getByRole("tooltip")).toHaveTextContent("Detalhes")
+})
+
+test("tooltip skips tooltip content when content is empty", () => {
+  render(
+    <Tooltip content="   ">
+      <span>item sem tooltip</span>
+    </Tooltip>,
+  )
+
+  expect(screen.getByText("item sem tooltip")).toBeInTheDocument()
+  expect(screen.queryByRole("tooltip")).not.toBeInTheDocument()
 })

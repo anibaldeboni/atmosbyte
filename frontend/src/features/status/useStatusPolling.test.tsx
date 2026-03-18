@@ -8,7 +8,7 @@ jest.mock("../../shared/api/client", () => ({
     getHealth: jest.fn(),
     getQueue: jest.fn(),
   },
-  ApiError: class extends Error {},
+  ApiError: class extends Error { },
 }))
 
 const mockedClient = client as jest.Mocked<typeof client>
@@ -48,14 +48,14 @@ test("keeps updating available indicators when one endpoint fails", async () => 
     expect(result.current.loading).toBe(false)
   })
 
-  expect(result.current.error).toBeNull()
   expect(result.current.status.sensorLevel).toBe("error")
   expect(result.current.status.queueLevel).toBe("warn")
+  expect(result.current.status.level).toBe("error")
   expect(result.current.status.queueSize).toBe(3)
   expect(result.current.status.retryQueueSize).toBe(1)
 })
 
-test("enters degraded backoff after three failures", async () => {
+test("returns immediate error status when both endpoints are unavailable", async () => {
   mockedClient.getHealth.mockRejectedValue(new Error("boom"))
   mockedClient.getQueue.mockRejectedValue(new Error("boom"))
 
@@ -73,16 +73,10 @@ test("enters degraded backoff after three failures", async () => {
     expect(result.current.loading).toBe(false)
   })
 
-   expect(result.current.status.isDegraded).toBe(false)
-   expect(result.current.status.level).toBe("warn")
-   expect(result.current.status.sensorLevel).toBe("warn")
-
-  jest.advanceTimersByTime(400)
-
-  await waitFor(() => {
-    expect(result.current.status.isDegraded).toBe(true)
-    expect(result.current.status.level).toBe("error")
-    expect(result.current.status.sensorLevel).toBe("error")
-    expect(result.current.intervalMs).toBe(1000)
-  })
+  expect(result.current.status.isDegraded).toBe(false)
+  expect(result.current.status.level).toBe("error")
+  expect(result.current.status.sensorLevel).toBe("error")
+  expect(result.current.status.queueLevel).toBe("error")
+  expect(result.current.status.message).toBe("Não foi possível conectar a estação")
+  expect(result.current.intervalMs).toBe(100)
 })

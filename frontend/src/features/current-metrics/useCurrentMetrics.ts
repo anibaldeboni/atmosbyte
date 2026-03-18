@@ -6,7 +6,7 @@ import type { MeasurementDto } from "../../shared/types/api"
 export interface CurrentMetricsState {
   data: MeasurementDto | null
   loading: boolean
-  error: string | null
+  error: ApiError | null
   degraded: boolean
   intervalMs: number
 }
@@ -30,7 +30,7 @@ const DEFAULT_POLICY: MetricsPolicy = {
 export function useCurrentMetrics(policy: MetricsPolicy = DEFAULT_POLICY): CurrentMetricsState {
   const [data, setData] = useState<MeasurementDto | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<ApiError | null>(null)
   const [intervalMs, setIntervalMs] = useState<number>(policy.intervalMs)
   const failures = useRef<number>(0)
 
@@ -55,7 +55,7 @@ export function useCurrentMetrics(policy: MetricsPolicy = DEFAULT_POLICY): Curre
         if (failures.current >= policy.degradedThreshold) {
           setIntervalMs(policy.degradedBackoffMs)
         }
-        setError(unknownError instanceof ApiError ? unknownError.message : "Atualização dos dados falhou")
+        setError(unknownError instanceof ApiError ? unknownError : new ApiError("network", "Atualização dos dados falhou"))
         setLoading(false)
         return
       }
