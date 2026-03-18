@@ -188,11 +188,15 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
             <option value="d">Dia</option>
           </select>
         </label>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:flex md:items-end">
-          <Button type="button" onClick={handleApply} className="w-full md:w-auto">
+        <div className="grid grid-cols-2 gap-2 md:flex md:items-end">
+          <Button type="button" onClick={handleApply} className="w-full whitespace-nowrap px-3 text-xs sm:px-4 sm:text-sm md:w-auto">
             Carregar
           </Button>
-          <Button type="button" onClick={handleExport} className="app-button-secondary w-full md:w-auto">
+          <Button
+            type="button"
+            onClick={handleExport}
+            className="app-button-secondary w-full whitespace-nowrap px-3 text-xs sm:px-4 sm:text-sm md:w-auto"
+          >
             Exportar CSV
           </Button>
         </div>
