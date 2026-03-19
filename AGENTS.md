@@ -91,7 +91,7 @@ It is based on the current Go, Makefile, npm, and lint configuration.
 - Should use skills `frontend-design` `ui-uix-pro-max` and `web-design-guidelines`
 - Should use component composition. Use skill `vercel-composition-patterns`
 - Should use skill `vercel-react-best-practices` for React coding
-- Prefer shadcn components instead of coding local component when available. Use skill `shadcn`
+- Must use shadcn components over of coding local component when available. Use skill `shadcn`
 
 ## Agent Workflow Recommendations
 
