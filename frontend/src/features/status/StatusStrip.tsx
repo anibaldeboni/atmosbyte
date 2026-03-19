@@ -80,15 +80,17 @@ export function StatusStrip(): React.JSX.Element {
   const systemLabel = humanStatus(status.level)
   const sensorLabel = humanStatus(status.sensorLevel)
   const queueLabel = `Fila: ${status.queueLevel == "error" ? "---" : status.queueSize}${status.retryQueueSize > 0 ? ` (${status.retryQueueSize} tentativas)` : ""}`
+  const itemLayoutClass = "w-[calc(50%-0.375rem)] xl:w-auto xl:flex-none"
+  const skeletonLayoutClass = "w-[calc(50%-0.375rem)] xl:w-[11.5rem]"
 
   if (loading) {
     return (
       <section className="status-strip border-b-2">
-        <div className="mx-auto grid w-full max-w-5xl grid-cols-2 gap-x-3 gap-y-2 px-4 py-2 text-sm md:grid-cols-2 xl:grid-cols-4">
-          <Skeleton className="status-strip-skeleton h-5 w-full" />
-          <Skeleton className="status-strip-skeleton h-5 w-full" />
-          <Skeleton className="status-strip-skeleton h-5 w-full" />
-          <Skeleton className="status-strip-skeleton h-5 w-full" />
+        <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-2 text-sm xl:gap-x-0">
+          <Skeleton className={`status-strip-skeleton h-5 ${skeletonLayoutClass}`} />
+          <Skeleton className={`status-strip-skeleton h-5 ${skeletonLayoutClass}`} />
+          <Skeleton className={`status-strip-skeleton h-5 ${skeletonLayoutClass}`} />
+          <Skeleton className={`status-strip-skeleton h-5 ${skeletonLayoutClass}`} />
         </div>
       </section>
     )
@@ -96,8 +98,8 @@ export function StatusStrip(): React.JSX.Element {
 
   return (
     <section className="status-strip border-b-2">
-      <div className="mx-auto grid w-full max-w-5xl grid-cols-2 gap-x-3 gap-y-2 px-4 py-2 text-[15px] md:grid-cols-2 xl:grid-cols-4">
-        <Tooltip as="div" className="w-full" content="Comunicação com a estação meteorológica">
+      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-2 text-[15px] xl:gap-x-0">
+        <Tooltip as="div" className={itemLayoutClass} content="Comunicação com a estação meteorológica">
           <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
             <span className={`status-item-icon ${dotClass(status.level)}`} aria-hidden="true">
               <ComputerIcon />
@@ -105,7 +107,7 @@ export function StatusStrip(): React.JSX.Element {
             <span>{systemLabel}</span>
           </p>
         </Tooltip>
-        <Tooltip as="div" className="w-full" content="Leitura dos sensores">
+        <Tooltip as="div" className={itemLayoutClass} content="Leitura dos sensores">
           <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
             <span className={`status-item-icon ${dotClass(status.sensorLevel)}`} aria-hidden="true">
               <ThermometerIcon />
@@ -113,7 +115,7 @@ export function StatusStrip(): React.JSX.Element {
             <span>{sensorLabel}</span>
           </p>
         </Tooltip>
-        <Tooltip as="div" className="w-full" content="Última atualização">
+        <Tooltip as="div" className={itemLayoutClass} content="Última atualização">
           <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
             <span className="status-item-icon status-icon-clock" aria-hidden="true">
               <ClockIcon />
@@ -121,7 +123,7 @@ export function StatusStrip(): React.JSX.Element {
             <span>{updatedLabel}</span>
           </p>
         </Tooltip>
-        <Tooltip as="div" className="w-full" content="Leituras pendentes na fila de processamento">
+        <Tooltip as="div" className={itemLayoutClass} content="Leituras pendentes na fila de processamento">
           <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
             <span className={`status-item-icon ${dotClass(status.queueLevel)}`} aria-hidden="true">
               <QueueListIcon />
