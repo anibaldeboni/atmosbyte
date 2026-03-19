@@ -1,5 +1,6 @@
 import React from "react"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { parseISO } from "date-fns"
 
 import { client } from "../../shared/api/client"
 import { HistoricalPage } from "../../pages/HistoricalPage"
@@ -18,13 +19,19 @@ jest.mock("react-datepicker", () => {
   return function MockDatePicker(props: {
     selected?: Date | null
     onChange?: (date: Date | null) => void
+    onChangeRaw?: (event: React.ChangeEvent<HTMLInputElement>) => void
+    showTimeSelect?: boolean
+    timeIntervals?: number
+    maxDate?: Date
     customInput: React.ReactElement<{ onClick?: () => void; value?: string }>
     onInputClick?: () => void
     open?: boolean
+    value?: string
   }) {
-    const value = props.selected instanceof Date && !Number.isNaN(props.selected.getTime())
+    const selectedValue = props.selected instanceof Date && !Number.isNaN(props.selected.getTime())
       ? `${props.selected.getFullYear()}-${String(props.selected.getMonth() + 1).padStart(2, "0")}-${String(props.selected.getDate()).padStart(2, "0")}T${String(props.selected.getHours()).padStart(2, "0")}:${String(props.selected.getMinutes()).padStart(2, "0")}`
       : ""
+    const value = props.value ?? selectedValue
 
     const input = props.customInput
     const mergedOnClick = () => {
@@ -36,8 +43,12 @@ jest.mock("react-datepicker", () => {
       <>
         {React.cloneElement(input, {
           value,
+          "data-show-time-select": props.showTimeSelect ? "true" : "false",
+          "data-time-intervals": String(props.timeIntervals ?? ""),
+          "data-has-max-date": props.maxDate instanceof Date ? "true" : "false",
           onClick: mergedOnClick,
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+            props.onChangeRaw?.(event)
             props.onChange?.(new Date(event.target.value))
           },
         })}
@@ -86,7 +97,7 @@ test("validates from <= to before querying", async () => {
 
   fireEvent.click(screen.getByRole("button", { name: "Carregar" }))
 
-  expect(await screen.findByText("From date must be before or equal to To date.")).toBeInTheDocument()
+  expect(await screen.findByText("A data de início deve ser anterior ou igual à data de término.")).toBeInTheDocument()
   expect(mockedClient.getHistorical).toHaveBeenCalledTimes(1)
 })
 
@@ -176,4 +187,110 @@ test("auto loads historical data on page mount", async () => {
   await waitFor(() => {
     expect(mockedClient.getHistorical).toHaveBeenCalledTimes(1)
   })
+})
+
+test("uses 1-minute intervals for minute granularity", async () => {
+  mockedClient.getHistorical.mockResolvedValue([])
+  render(<HistoricalPage />)
+
+  await waitFor(() => {
+    expect(mockedClient.getHistorical).toHaveBeenCalledTimes(1)
+  })
+
+  fireEvent.change(screen.getByLabelText("Granularidade"), { target: { value: "m" } })
+
+  expect(screen.getByLabelText("De")).toHaveAttribute("data-time-intervals", "1")
+  expect(screen.getByLabelText("Até")).toHaveAttribute("data-time-intervals", "1")
+  expect(screen.getByLabelText("De")).toHaveAttribute("data-show-time-select", "true")
+  expect(screen.getByLabelText("Até")).toHaveAttribute("data-show-time-select", "true")
+
+  fireEvent.click(screen.getByRole("button", { name: "Carregar" }))
+
+  await waitFor(() => {
+    expect(mockedClient.getHistorical).toHaveBeenCalledTimes(2)
+  })
+
+  const secondQuery = mockedClient.getHistorical.mock.calls[1][0]
+  const fromIso = parseISO(secondQuery.from)
+  const toIso = parseISO(secondQuery.to)
+  const diffMs = toIso.getTime() - fromIso.getTime()
+
+  expect(toIso.getUTCMinutes()).toBe(0)
+  expect(fromIso.getUTCMinutes()).toBe(0)
+  expect(diffMs).toBe(60 * 60 * 1000)
+})
+
+test("uses 1-hour intervals for hourly granularity", async () => {
+  mockedClient.getHistorical.mockResolvedValue([])
+  render(<HistoricalPage />)
+
+  await waitFor(() => {
+    expect(mockedClient.getHistorical).toHaveBeenCalledTimes(1)
+  })
+
+  fireEvent.change(screen.getByLabelText("Granularidade"), { target: { value: "h" } })
+
+  expect(screen.getByLabelText("De")).toHaveAttribute("data-time-intervals", "60")
+  expect(screen.getByLabelText("Até")).toHaveAttribute("data-time-intervals", "60")
+  expect(screen.getByLabelText("De")).toHaveAttribute("data-show-time-select", "true")
+  expect(screen.getByLabelText("Até")).toHaveAttribute("data-show-time-select", "true")
+
+  fireEvent.click(screen.getByRole("button", { name: "Carregar" }))
+
+  await waitFor(() => {
+    expect(mockedClient.getHistorical).toHaveBeenCalledTimes(2)
+  })
+
+  const secondQuery = mockedClient.getHistorical.mock.calls[1][0]
+  const fromIso = parseISO(secondQuery.from)
+  const toIso = parseISO(secondQuery.to)
+  const diffMs = toIso.getTime() - fromIso.getTime()
+
+  expect(toIso.getUTCMinutes()).toBe(0)
+  expect(fromIso.getUTCMinutes()).toBe(0)
+  expect(diffMs).toBe(24 * 60 * 60 * 1000)
+})
+
+test("hides time selection and resets range to one month for daily granularity", async () => {
+  mockedClient.getHistorical.mockResolvedValue([])
+  render(<HistoricalPage />)
+
+  await waitFor(() => {
+    expect(mockedClient.getHistorical).toHaveBeenCalledTimes(1)
+  })
+
+  fireEvent.change(screen.getByLabelText("Granularidade"), { target: { value: "d" } })
+  fireEvent.click(screen.getByRole("button", { name: "Carregar" }))
+
+  await waitFor(() => {
+    expect(mockedClient.getHistorical).toHaveBeenCalledTimes(2)
+  })
+
+  const secondQuery = mockedClient.getHistorical.mock.calls[1][0]
+  const fromIso = parseISO(secondQuery.from)
+  const toIso = parseISO(secondQuery.to)
+
+  expect(screen.getByLabelText("De")).toHaveAttribute("data-show-time-select", "false")
+  expect(screen.getByLabelText("Até")).toHaveAttribute("data-show-time-select", "false")
+  expect(toIso.getUTCMinutes()).toBe(0)
+  expect(fromIso.getUTCMinutes()).toBe(0)
+  expect(toIso.getUTCMonth() - fromIso.getUTCMonth() + (toIso.getUTCFullYear() - fromIso.getUTCFullYear()) * 12).toBe(1)
+  expect(toIso.getUTCDate()).toBe(fromIso.getUTCDate())
+  expect(toIso.getUTCHours()).toBe(fromIso.getUTCHours())
+})
+
+test("rejects future date values before querying", async () => {
+  mockedClient.getHistorical.mockResolvedValue([])
+  render(<HistoricalPage />)
+
+  await waitFor(() => {
+    expect(mockedClient.getHistorical).toHaveBeenCalledTimes(1)
+  })
+
+  fireEvent.change(screen.getByLabelText("De"), { target: { value: "2999-01-01T00:00" } })
+  fireEvent.change(screen.getByLabelText("Até"), { target: { value: "2999-01-01T01:00" } })
+  fireEvent.click(screen.getByRole("button", { name: "Carregar" }))
+
+  expect(await screen.findByText("Os valores de data não podem estar no futuro.")).toBeInTheDocument()
+  expect(mockedClient.getHistorical).toHaveBeenCalledTimes(1)
 })

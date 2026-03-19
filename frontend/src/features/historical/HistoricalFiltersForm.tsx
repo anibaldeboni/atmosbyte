@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useRef, useState } from "react"
 import DatePicker from "react-datepicker"
-import { format, intlFormat, isValid, parse, subHours } from "date-fns"
+import { endOfDay, format, intlFormat, isSameDay, isValid, parse, startOfDay, startOfHour, subHours, subMonths } from "date-fns"
 
 import { Button } from "../../shared/ui/Button"
 import { InlineAlert } from "../../shared/ui/InlineAlert"
@@ -13,6 +13,42 @@ const BROWSER_DATE_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
   day: "2-digit",
   hour: "2-digit",
   minute: "2-digit",
+}
+const BROWSER_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+}
+
+function timeIntervalByType(type: AggregationKind): number {
+  if (type === "h") {
+    return 60
+  }
+
+  return 1
+}
+
+function buildRangeForType(type: AggregationKind, nowDate: Date): { from: Date; to: Date } {
+  const anchoredNow = startOfHour(nowDate)
+
+  if (type === "m") {
+    return {
+      from: subHours(anchoredNow, 1),
+      to: anchoredNow,
+    }
+  }
+
+  if (type === "d") {
+    return {
+      from: subMonths(anchoredNow, 1),
+      to: anchoredNow,
+    }
+  }
+
+  return {
+    from: subHours(anchoredNow, 24),
+    to: anchoredNow,
+  }
 }
 
 function parseLocalDateTime(value: string): Date | null {
@@ -70,9 +106,9 @@ const DatePickerInput = forwardRef<HTMLInputElement, DatePickerInputProps>(funct
 })
 
 export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFormProps): React.JSX.Element {
-  const now = new Date()
-  const [from, setFrom] = useState<string>(format(subHours(now, 24), LOCAL_DATE_TIME_PATTERN))
-  const [to, setTo] = useState<string>(format(now, LOCAL_DATE_TIME_PATTERN))
+  const initialRange = buildRangeForType("h", new Date())
+  const [from, setFrom] = useState<string>(format(initialRange.from, LOCAL_DATE_TIME_PATTERN))
+  const [to, setTo] = useState<string>(format(initialRange.to, LOCAL_DATE_TIME_PATTERN))
   const [type, setType] = useState<AggregationKind>("h")
   const [error, setError] = useState<string | null>(null)
   const [fromOpen, setFromOpen] = useState<boolean>(false)
@@ -82,6 +118,12 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
   const values: HistoricalFiltersValues = { from, to, type }
   const fromDateValue = parseLocalDateTime(from)
   const toDateValue = parseLocalDateTime(to)
+  const showTimeSelect = type !== "d"
+  const timeIntervals = timeIntervalByType(type)
+  const nowForPicker = new Date()
+  const minTime = startOfDay(nowForPicker)
+  const fromMaxTime = fromDateValue && isSameDay(fromDateValue, nowForPicker) ? nowForPicker : endOfDay(nowForPicker)
+  const toMaxTime = toDateValue && isSameDay(toDateValue, nowForPicker) ? nowForPicker : endOfDay(nowForPicker)
 
   useEffect(() => {
     if (didAutoLoadRef.current) {
@@ -93,12 +135,18 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
   }, [onApply, values])
 
   const validate = (): boolean => {
+    const nowDate = new Date()
+
     if (!fromDateValue || !toDateValue) {
-      setError("Please provide valid date range values.")
+      setError("Por favor forneça um intervalo de datas válido.")
+      return false
+    }
+    if (fromDateValue.getTime() > nowDate.getTime() || toDateValue.getTime() > nowDate.getTime()) {
+      setError("Os valores de data não podem estar no futuro.")
       return false
     }
     if (fromDateValue.getTime() > toDateValue.getTime()) {
-      setError("From date must be before or equal to To date.")
+      setError("A data de início deve ser anterior ou igual à data de término.")
       return false
     }
     setError(null)
@@ -141,10 +189,13 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
             onCalendarClose={() => setFromOpen(false)}
             onSelect={() => setFromOpen(false)}
             open={fromOpen}
-            showTimeSelect
-            timeIntervals={1}
+            showTimeSelect={showTimeSelect}
+            timeIntervals={timeIntervals}
+            maxDate={nowForPicker}
+            minTime={minTime}
+            maxTime={fromMaxTime}
             customInputRef="input"
-            value={fromDateValue ? intlFormat(fromDateValue, BROWSER_DATE_TIME_OPTIONS) : ""}
+            value={fromDateValue ? intlFormat(fromDateValue, showTimeSelect ? BROWSER_DATE_TIME_OPTIONS : BROWSER_DATE_OPTIONS) : ""}
             timeFormat="HH:mm"
             portalId="root"
             popperPlacement="bottom-start"
@@ -177,10 +228,13 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
             onCalendarClose={() => setToOpen(false)}
             onSelect={() => setToOpen(false)}
             open={toOpen}
-            showTimeSelect
-            timeIntervals={1}
+            showTimeSelect={showTimeSelect}
+            timeIntervals={timeIntervals}
+            maxDate={nowForPicker}
+            minTime={minTime}
+            maxTime={toMaxTime}
             customInputRef="input"
-            value={toDateValue ? intlFormat(toDateValue, BROWSER_DATE_TIME_OPTIONS) : ""}
+            value={toDateValue ? intlFormat(toDateValue, showTimeSelect ? BROWSER_DATE_TIME_OPTIONS : BROWSER_DATE_OPTIONS) : ""}
             timeFormat="HH:mm"
             portalId="root"
             popperPlacement="bottom-start"
@@ -199,7 +253,14 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
           <select
             className="historical-field-control historical-inline-control block min-w-0 rounded-md border px-3 py-2 text-[16px] md:mt-1"
             value={type}
-            onChange={(event) => setType(event.target.value as AggregationKind)}
+            onChange={(event) => {
+              const selectedType = event.target.value as AggregationKind
+              setType(selectedType)
+
+              const adjustedRange = buildRangeForType(selectedType, new Date())
+              setFrom(format(adjustedRange.from, LOCAL_DATE_TIME_PATTERN))
+              setTo(format(adjustedRange.to, LOCAL_DATE_TIME_PATTERN))
+            }}
           >
             <option value="m">Minuto</option>
             <option value="h">Hora</option>
