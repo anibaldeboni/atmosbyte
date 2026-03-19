@@ -1,10 +1,12 @@
 import type { PropsWithChildren } from "react"
 
+import { alertToneClass, type AlertTone } from "./alertTone"
+import { cn } from "./cn"
+
 interface InlineAlertProps extends PropsWithChildren {
-  tone?: "info" | "warn" | "error"
+  tone?: AlertTone
 }
 
 export function InlineAlert({ children, tone = "info" }: InlineAlertProps): React.JSX.Element {
-  const toneClass = tone === "error" ? "inline-alert-error" : tone === "warn" ? "inline-alert-warn" : "inline-alert-info"
-  return <div className={`rounded-md border px-3 py-2 text-sm ${toneClass}`}>{children}</div>
+  return <div className={cn("rounded-md border px-3 py-2 text-sm", alertToneClass(tone))}>{children}</div>
 }

@@ -1,19 +1,12 @@
 import { useCallback, useEffect, useRef, useState, type PropsWithChildren } from "react"
 
+import { alertToneClass, type AlertTone } from "./alertTone"
+import { cn } from "./cn"
+
 interface ToastProps extends PropsWithChildren {
-  tone?: "info" | "warn" | "error"
+  tone?: AlertTone
   title?: string
   autoHideMs?: number
-}
-
-function toneClass(tone: "info" | "warn" | "error"): string {
-  if (tone === "error") {
-    return "toast toast-error"
-  }
-  if (tone === "warn") {
-    return "toast toast-warn"
-  }
-  return "toast toast-info"
 }
 
 export function Toast({ children, tone = "info", title, autoHideMs = 5000 }: ToastProps): React.JSX.Element {
@@ -73,12 +66,13 @@ export function Toast({ children, tone = "info", title, autoHideMs = 5000 }: Toa
 
   return (
     <div
-      className={`fixed right-4 top-4 z-50 w-[min(460px,calc(100vw-2rem))] transition-all duration-300 ease-out ${
-        visible ? "pointer-events-none translate-y-0 opacity-100" : "pointer-events-none -translate-y-2 opacity-0"
-      }`}
+      className={cn(
+        "fixed right-4 top-4 z-50 w-[min(460px,calc(100vw-2rem))] pointer-events-none transition-all duration-300 ease-out",
+        visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0",
+      )}
     >
       <div
-        className={`pointer-events-auto rounded-lg border px-4 py-3 shadow-lg ${toneClass(tone)}`}
+        className={cn("toast pointer-events-auto rounded-lg border px-4 py-3 shadow-lg", alertToneClass(tone))}
         role="alert"
         aria-live="polite"
         onMouseEnter={pauseTimer}

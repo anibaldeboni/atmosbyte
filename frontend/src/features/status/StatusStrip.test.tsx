@@ -33,13 +33,15 @@ test("uses flex space-between layout for loaded items", () => {
     const { container } = render(<StatusStrip />)
 
     const layout = container.querySelector(".status-strip > div")
-    const items = container.querySelectorAll(".status-strip > div > .group")
+    const items = screen.getAllByRole("tooltip")
 
     expect(layout).not.toBeNull()
     expect(layout).toHaveClass("flex", "flex-wrap", "justify-between", "xl:gap-x-0")
     expect(items).toHaveLength(4)
     items.forEach(item => {
-        expect(item).toHaveClass("w-[calc(50%-0.375rem)]", "xl:w-auto", "xl:flex-none")
+        const wrapper = item.parentElement
+        expect(wrapper).not.toBeNull()
+        expect(wrapper).toHaveClass("w-[calc(50%-0.375rem)]", "xl:w-auto", "xl:flex-none")
     })
     expect(screen.getByText("Fila: 3 (1 tentativas)")).toBeInTheDocument()
 })

@@ -33,6 +33,8 @@ function setMatchMedia(matches: boolean): void {
 beforeEach(() => {
   window.localStorage.clear()
   document.documentElement.dataset.theme = ""
+  document.documentElement.style.colorScheme = ""
+  document.head.innerHTML = '<meta name="theme-color" content="#166534" />'
   setMatchMedia(false)
 })
 
@@ -74,11 +76,16 @@ test("theme toggle updates html dataset and localStorage", async () => {
   await user.click(screen.getByTestId("theme-toggle"))
 
   expect(document.documentElement.dataset.theme).toBe("dark")
+  expect(document.documentElement.style.colorScheme).toBe("dark")
+  expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute("content", "#171f31")
   expect(setItemSpy).toHaveBeenCalledWith(THEME_STORAGE_KEY, "dark")
 })
 
 test("theme toggle still updates html dataset when localStorage.setItem throws", async () => {
   const user = userEvent.setup()
+  const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
+    // The test intentionally simulates localStorage failures.
+  })
   jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
     throw new Error("blocked")
   })
@@ -92,4 +99,7 @@ test("theme toggle still updates html dataset when localStorage.setItem throws",
   await user.click(screen.getByTestId("theme-toggle"))
 
   expect(document.documentElement.dataset.theme).toBe("dark")
+  expect(warnSpy).toHaveBeenCalled()
+
+  warnSpy.mockRestore()
 })

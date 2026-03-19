@@ -1,11 +1,21 @@
 import { applyInitialTheme } from "./bootstrapTheme"
 
 function createDocumentMock(windowLike?: Window): Document {
+  const root = {
+    dataset: {},
+    style: {
+      colorScheme: "",
+    },
+  }
+
+  const meta = {
+    setAttribute: jest.fn(),
+  }
+
   return {
     defaultView: windowLike,
-    documentElement: {
-      dataset: {},
-    },
+    documentElement: root,
+    querySelector: jest.fn().mockReturnValue(meta),
   } as unknown as Document
 }
 
@@ -23,6 +33,7 @@ test("bootstrap applies dark theme when storage prefers dark", () => {
 
   expect(theme).toBe("dark")
   expect(doc.documentElement.dataset.theme).toBe("dark")
+  expect(doc.documentElement.style.colorScheme).toBe("dark")
 })
 
 test("bootstrap defaults to light when storage/media access throws", () => {
@@ -43,4 +54,5 @@ test("bootstrap defaults to light when storage/media access throws", () => {
 
   expect(theme).toBe("light")
   expect(doc.documentElement.dataset.theme).toBe("light")
+  expect(doc.documentElement.style.colorScheme).toBe("light")
 })

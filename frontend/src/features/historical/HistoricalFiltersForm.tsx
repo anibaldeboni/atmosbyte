@@ -204,7 +204,7 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
               <DatePickerInput
                 calendarLabel="Abrir calendário De"
                 onCalendarClick={() => setFromOpen(true)}
-                className="historical-field-control historical-datepicker-input block w-full min-w-0 rounded-md border px-3 py-2 pr-11 text-[16px]"
+                className="historical-field-control historical-field-control-size historical-datepicker-input block w-full min-w-0 rounded-md border px-3 py-2 pr-11"
               />
             )}
           />
@@ -243,7 +243,7 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
               <DatePickerInput
                 calendarLabel="Abrir calendário Até"
                 onCalendarClick={() => setToOpen(true)}
-                className="historical-field-control historical-datepicker-input block w-full min-w-0 rounded-md border px-3 py-2 pr-11 text-[16px]"
+                className="historical-field-control historical-field-control-size historical-datepicker-input block w-full min-w-0 rounded-md border px-3 py-2 pr-11"
               />
             )}
           />
@@ -251,7 +251,7 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
         <label className="historical-field-label historical-field-row min-w-0 text-sm font-medium">
           Granularidade
           <select
-            className="historical-field-control historical-inline-control block min-w-0 rounded-md border px-3 py-2 text-[16px] md:mt-1"
+            className="historical-field-control historical-field-control-size historical-inline-control block min-w-0 rounded-md border px-3 py-2 md:mt-1"
             value={type}
             onChange={(event) => {
               const selectedType = event.target.value as AggregationKind
@@ -268,13 +268,15 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
           </select>
         </label>
         <div className="grid grid-cols-2 gap-2 md:flex md:items-end">
-          <Button type="button" onClick={handleApply} className="w-full whitespace-nowrap px-3 text-xs sm:px-4 sm:text-sm md:w-auto">
+          <Button type="button" onClick={handleApply} size="sm" className="w-full whitespace-nowrap md:w-auto">
             Carregar
           </Button>
           <Button
             type="button"
             onClick={handleExport}
-            className="app-button-secondary w-full whitespace-nowrap px-3 text-xs sm:px-4 sm:text-sm md:w-auto"
+            variant="secondary"
+            size="sm"
+            className="w-full whitespace-nowrap md:w-auto"
           >
             Exportar CSV
           </Button>

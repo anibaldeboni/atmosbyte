@@ -1,4 +1,5 @@
 import { resolveThemeFromWindow, type Theme } from "./themeResolver"
+import { applyThemeToDocument } from "./themeDom"
 
 export function resolveBootstrapTheme(win: Window): Theme {
   return resolveThemeFromWindow(win)
@@ -12,10 +13,10 @@ export function applyInitialTheme(doc: Document = document): Theme {
     }
 
     const theme = resolveBootstrapTheme(win)
-    doc.documentElement.dataset.theme = theme
+    applyThemeToDocument(doc, theme)
     return theme
   } catch {
-    doc.documentElement.dataset.theme = "light"
+    applyThemeToDocument(doc, "light")
     return "light"
   }
 }

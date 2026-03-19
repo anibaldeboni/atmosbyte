@@ -5,7 +5,7 @@ import { EmptyState } from "../../shared/ui/EmptyState"
 
 function TemperatureIcon(): React.JSX.Element {
   return (
-    <svg viewBox="0 0 24 24" className="h-[26px] w-[26px]" fill="none" role="img">
+    <svg viewBox="0 0 24 24" className="metric-card-icon-svg" fill="none" role="img">
       <path
         d="M14 14.76V5a2 2 0 1 0-4 0v9.76a4 4 0 1 0 4 0Z"
         stroke="currentColor"
@@ -20,7 +20,7 @@ function TemperatureIcon(): React.JSX.Element {
 
 function HumidityIcon(): React.JSX.Element {
   return (
-    <svg viewBox="0 0 24 24" className="h-[26px] w-[26px]" fill="none" role="img">
+    <svg viewBox="0 0 24 24" className="metric-card-icon-svg" fill="none" role="img">
       <path
         d="M12 3.5C9 7.5 6 10.2 6 14a6 6 0 1 0 12 0c0-3.8-3-6.5-6-10.5Z"
         stroke="currentColor"
@@ -34,7 +34,7 @@ function HumidityIcon(): React.JSX.Element {
 
 function PressureIcon(): React.JSX.Element {
   return (
-    <svg viewBox="0 0 24 24" className="h-[26px] w-[26px]" fill="none" role="img">
+    <svg viewBox="0 0 24 24" className="metric-card-icon-svg" fill="none" role="img">
       <path d="M5 15h3M10.5 12h3M16 9h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
       <path d="M4 18h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>

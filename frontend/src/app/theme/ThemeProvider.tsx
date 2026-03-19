@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react"
 
 import { resolveThemeFromWindow, THEME_STORAGE_KEY, type Theme, isTheme } from "./themeResolver"
+import { applyThemeToDocument } from "./themeDom"
 
 type ThemeContextValue = {
   theme: Theme
@@ -23,7 +24,7 @@ export function ThemeProvider({ children }: PropsWithChildren): React.JSX.Elemen
   const [theme, setTheme] = useState<Theme>(() => getInitialTheme(document))
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme
+    applyThemeToDocument(document, theme)
   }, [theme])
 
   const value = useMemo<ThemeContextValue>(
@@ -35,7 +36,8 @@ export function ThemeProvider({ children }: PropsWithChildren): React.JSX.Elemen
 
           try {
             window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme)
-          } catch {
+          } catch (error: unknown) {
+            console.warn("Unable to persist theme preference", error)
           }
 
           return nextTheme

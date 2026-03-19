@@ -1,16 +1,8 @@
 import { useStatusPolling } from "./useStatusPolling"
 import { Skeleton } from "../../shared/ui/Skeleton"
 import { Tooltip } from "../../shared/ui/Tooltip"
-
-function dotClass(level: "ok" | "warn" | "error"): string {
-  if (level === "error") {
-    return "status-icon-error"
-  }
-  if (level === "warn") {
-    return "status-icon-warn"
-  }
-  return "status-icon-ok"
-}
+import { cn } from "../../shared/ui/cn"
+import { humanStatus, statusIconToneClass } from "./statusPresentation"
 
 function ComputerIcon(): React.JSX.Element {
   return (
@@ -56,16 +48,6 @@ function QueueListIcon(): React.JSX.Element {
   )
 }
 
-function humanStatus(level: string): string {
-  if (level === "error") {
-    return "Indisponível"
-  }
-  if (level === "warn") {
-    return "Degradado"
-  }
-  return "Operacional"
-}
-
 function fmtDateWithBrowserLocale(dateStr: number): string {
   const date = new Date(dateStr)
   const currentBrowserLocale = navigator.language || "en-US"
@@ -87,10 +69,10 @@ export function StatusStrip(): React.JSX.Element {
     return (
       <section className="status-strip border-b-2">
         <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-2 text-sm xl:gap-x-0">
-          <Skeleton className={`status-strip-skeleton h-5 ${skeletonLayoutClass}`} />
-          <Skeleton className={`status-strip-skeleton h-5 ${skeletonLayoutClass}`} />
-          <Skeleton className={`status-strip-skeleton h-5 ${skeletonLayoutClass}`} />
-          <Skeleton className={`status-strip-skeleton h-5 ${skeletonLayoutClass}`} />
+          <Skeleton className={cn("status-strip-skeleton h-5", skeletonLayoutClass)} />
+          <Skeleton className={cn("status-strip-skeleton h-5", skeletonLayoutClass)} />
+          <Skeleton className={cn("status-strip-skeleton h-5", skeletonLayoutClass)} />
+          <Skeleton className={cn("status-strip-skeleton h-5", skeletonLayoutClass)} />
         </div>
       </section>
     )
@@ -98,10 +80,10 @@ export function StatusStrip(): React.JSX.Element {
 
   return (
     <section className="status-strip border-b-2">
-      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-2 text-[15px] xl:gap-x-0">
+      <div className="status-strip-text-size mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-2 xl:gap-x-0">
         <Tooltip as="div" className={itemLayoutClass} content="Comunicação com a estação meteorológica">
           <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
-            <span className={`status-item-icon ${dotClass(status.level)}`} aria-hidden="true">
+            <span className={cn("status-item-icon", statusIconToneClass(status.level))} aria-hidden="true">
               <ComputerIcon />
             </span>
             <span>{systemLabel}</span>
@@ -109,7 +91,7 @@ export function StatusStrip(): React.JSX.Element {
         </Tooltip>
         <Tooltip as="div" className={itemLayoutClass} content="Leitura dos sensores">
           <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
-            <span className={`status-item-icon ${dotClass(status.sensorLevel)}`} aria-hidden="true">
+            <span className={cn("status-item-icon", statusIconToneClass(status.sensorLevel))} aria-hidden="true">
               <ThermometerIcon />
             </span>
             <span>{sensorLabel}</span>
@@ -125,7 +107,7 @@ export function StatusStrip(): React.JSX.Element {
         </Tooltip>
         <Tooltip as="div" className={itemLayoutClass} content="Leituras pendentes na fila de processamento">
           <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
-            <span className={`status-item-icon ${dotClass(status.queueLevel)}`} aria-hidden="true">
+            <span className={cn("status-item-icon", statusIconToneClass(status.queueLevel))} aria-hidden="true">
               <QueueListIcon />
             </span>
             <span>{queueLabel}</span>
