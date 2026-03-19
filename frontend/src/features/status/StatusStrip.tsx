@@ -84,7 +84,7 @@ export function StatusStrip(): React.JSX.Element {
   if (loading) {
     return (
       <section className="status-strip border-b-2">
-        <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-x-3 gap-y-2 px-4 py-2 text-sm md:grid-cols-2 xl:grid-cols-4">
+        <div className="mx-auto grid w-full max-w-5xl grid-cols-2 gap-x-3 gap-y-2 px-4 py-2 text-sm md:grid-cols-2 xl:grid-cols-4">
           <Skeleton className="status-strip-skeleton h-5 w-full" />
           <Skeleton className="status-strip-skeleton h-5 w-full" />
           <Skeleton className="status-strip-skeleton h-5 w-full" />
@@ -96,7 +96,7 @@ export function StatusStrip(): React.JSX.Element {
 
   return (
     <section className="status-strip border-b-2">
-      <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-x-3 gap-y-2 px-4 py-2 text-[15px] md:grid-cols-2 xl:grid-cols-4">
+      <div className="mx-auto grid w-full max-w-5xl grid-cols-2 gap-x-3 gap-y-2 px-4 py-2 text-[15px] md:grid-cols-2 xl:grid-cols-4">
         <Tooltip as="div" className="w-full" content="Comunicação com a estação meteorológica">
           <p className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
             <span className={`status-item-icon ${dotClass(status.level)}`} aria-hidden="true">
