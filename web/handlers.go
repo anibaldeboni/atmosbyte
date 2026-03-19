@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/anibaldeboni/zero-paper/atmosbyte/internal/timezone"
 	"github.com/anibaldeboni/zero-paper/atmosbyte/weather"
 )
 
@@ -167,6 +168,9 @@ func parseHistoricalQuery(r *http.Request) (time.Time, time.Time, weather.Aggreg
 		aggregationKind = weather.Hour
 	}
 
+	// Get machine's local timezone for database queries
+	machineLocation := timezone.GetMachineLocation()
+
 	if fromStr != "" {
 		fromTime, err = time.Parse(time.RFC3339, fromStr)
 		if err != nil {
@@ -189,13 +193,20 @@ func parseHistoricalQuery(r *http.Request) (time.Time, time.Time, weather.Aggreg
 		return time.Time{}, time.Time{}, weather.Hour, errors.New("from must be before or equal to to")
 	}
 
+	// Convert UTC timestamps from frontend to machine's local timezone
+	// The frontend sends UTC (with Z suffix), and we need to convert to local timezone
+	// because measurements are stored with machine-local timestamps in the database
 	if fromTime.Location() != time.UTC {
 		fromTime = fromTime.UTC()
 	}
-
 	if toTime.Location() != time.UTC {
 		toTime = toTime.UTC()
 	}
+
+	// Convert UTC times to machine local timezone for database queries
+	// This ensures we query the correct time range against local timestamps stored in the DB
+	fromTime = fromTime.In(machineLocation)
+	toTime = toTime.In(machineLocation)
 
 	return fromTime, toTime, aggregationKind, nil
 }

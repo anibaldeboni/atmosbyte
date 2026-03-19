@@ -1,10 +1,28 @@
 import { forwardRef, useEffect, useRef, useState } from "react"
 import DatePicker from "react-datepicker"
+import { format, intlFormat, isValid, parse, subHours } from "date-fns"
 
 import { Button } from "../../shared/ui/Button"
 import { InlineAlert } from "../../shared/ui/InlineAlert"
 import type { AggregationKind } from "../../shared/types/status"
-import { formatDateTimeForBrowserLocale, fromDateToLocalDateTime, fromLocalDateTimeToDate } from "./dateTimeLocal"
+
+const LOCAL_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm"
+const BROWSER_DATE_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+}
+
+function parseLocalDateTime(value: string): Date | null {
+  const parsed = parse(value, LOCAL_DATE_TIME_PATTERN, new Date())
+  if (!isValid(parsed)) {
+    return null
+  }
+
+  return format(parsed, LOCAL_DATE_TIME_PATTERN) === value ? parsed : null
+}
 
 interface HistoricalFiltersValues {
   from: string
@@ -53,8 +71,8 @@ const DatePickerInput = forwardRef<HTMLInputElement, DatePickerInputProps>(funct
 
 export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFormProps): React.JSX.Element {
   const now = new Date()
-  const [from, setFrom] = useState<string>(fromDateToLocalDateTime(new Date(now.getTime() - 24 * 60 * 60 * 1000)))
-  const [to, setTo] = useState<string>(fromDateToLocalDateTime(now))
+  const [from, setFrom] = useState<string>(format(subHours(now, 24), LOCAL_DATE_TIME_PATTERN))
+  const [to, setTo] = useState<string>(format(now, LOCAL_DATE_TIME_PATTERN))
   const [type, setType] = useState<AggregationKind>("h")
   const [error, setError] = useState<string | null>(null)
   const [fromOpen, setFromOpen] = useState<boolean>(false)
@@ -62,6 +80,8 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
   const didAutoLoadRef = useRef<boolean>(false)
 
   const values: HistoricalFiltersValues = { from, to, type }
+  const fromDateValue = parseLocalDateTime(from)
+  const toDateValue = parseLocalDateTime(to)
 
   useEffect(() => {
     if (didAutoLoadRef.current) {
@@ -73,13 +93,11 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
   }, [onApply, values])
 
   const validate = (): boolean => {
-    const fromDate = new Date(from)
-    const toDate = new Date(to)
-    if (Number.isNaN(fromDate.getTime()) || Number.isNaN(toDate.getTime())) {
+    if (!fromDateValue || !toDateValue) {
       setError("Please provide valid date range values.")
       return false
     }
-    if (fromDate.getTime() > toDate.getTime()) {
+    if (fromDateValue.getTime() > toDateValue.getTime()) {
       setError("From date must be before or equal to To date.")
       return false
     }
@@ -107,10 +125,10 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
         <label className="historical-field-label historical-field-row min-w-0 text-sm font-medium">
           De
           <DatePicker
-            selected={fromLocalDateTimeToDate(from)}
+            selected={fromDateValue}
             onChange={(value: Date | null) => {
               if (value instanceof Date) {
-                setFrom(fromDateToLocalDateTime(value))
+                setFrom(format(value, LOCAL_DATE_TIME_PATTERN))
               }
             }}
             onChangeRaw={(event) => {
@@ -126,7 +144,7 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
             showTimeSelect
             timeIntervals={1}
             customInputRef="input"
-            value={formatDateTimeForBrowserLocale(fromLocalDateTimeToDate(from))}
+            value={fromDateValue ? intlFormat(fromDateValue, BROWSER_DATE_TIME_OPTIONS) : ""}
             timeFormat="HH:mm"
             portalId="root"
             popperPlacement="bottom-start"
@@ -143,10 +161,10 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
         <label className="historical-field-label historical-field-row min-w-0 text-sm font-medium">
           Até
           <DatePicker
-            selected={fromLocalDateTimeToDate(to)}
+            selected={toDateValue}
             onChange={(value: Date | null) => {
               if (value instanceof Date) {
-                setTo(fromDateToLocalDateTime(value))
+                setTo(format(value, LOCAL_DATE_TIME_PATTERN))
               }
             }}
             onChangeRaw={(event) => {
@@ -162,7 +180,7 @@ export function HistoricalFiltersForm({ onApply, onExport }: HistoricalFiltersFo
             showTimeSelect
             timeIntervals={1}
             customInputRef="input"
-            value={formatDateTimeForBrowserLocale(fromLocalDateTimeToDate(to))}
+            value={toDateValue ? intlFormat(toDateValue, BROWSER_DATE_TIME_OPTIONS) : ""}
             timeFormat="HH:mm"
             portalId="root"
             popperPlacement="bottom-start"

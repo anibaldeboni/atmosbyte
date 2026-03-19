@@ -1,4 +1,6 @@
 import { lazy, Suspense, useMemo } from "react"
+import { parse } from "date-fns"
+import { TZDate } from "@date-fns/tz"
 
 import { HistoricalFiltersForm } from "../features/historical/HistoricalFiltersForm"
 import { useHistoricalData } from "../features/historical/useHistoricalData"
@@ -19,9 +21,7 @@ const HistoricalCharts = lazy(async () => {
   return { default: module.HistoricalCharts }
 })
 
-function toIso(value: string): string {
-  return new Date(value).toISOString()
-}
+const LOCAL_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm"
 
 export function HistoricalPage({ }: HistoricalPageProps): React.JSX.Element {
   const { data, loading, error, load } = useHistoricalData()
@@ -29,16 +29,76 @@ export function HistoricalPage({ }: HistoricalPageProps): React.JSX.Element {
   const handlers = useMemo(
     () => ({
       onApply: (values: FilterValues) => {
+        const fromLocalDate = parse(values.from, LOCAL_DATE_TIME_PATTERN, new Date())
+        const toLocalDate = parse(values.to, LOCAL_DATE_TIME_PATTERN, new Date())
+        const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+        const fromIso = browserTimeZone
+          ? TZDate.tz(
+            browserTimeZone,
+            fromLocalDate.getFullYear(),
+            fromLocalDate.getMonth(),
+            fromLocalDate.getDate(),
+            fromLocalDate.getHours(),
+            fromLocalDate.getMinutes(),
+            fromLocalDate.getSeconds(),
+            fromLocalDate.getMilliseconds(),
+          )
+          : fromLocalDate
+
+        const toIso = browserTimeZone
+          ? TZDate.tz(
+            browserTimeZone,
+            toLocalDate.getFullYear(),
+            toLocalDate.getMonth(),
+            toLocalDate.getDate(),
+            toLocalDate.getHours(),
+            toLocalDate.getMinutes(),
+            toLocalDate.getSeconds(),
+            toLocalDate.getMilliseconds(),
+          )
+          : toLocalDate
+
         void load({
-          from: toIso(values.from),
-          to: toIso(values.to),
+          from: new Date(fromIso.getTime()).toISOString(),
+          to: new Date(toIso.getTime()).toISOString(),
           type: values.type,
         })
       },
       onExport: (values: FilterValues) => {
+        const fromLocalDate = parse(values.from, LOCAL_DATE_TIME_PATTERN, new Date())
+        const toLocalDate = parse(values.to, LOCAL_DATE_TIME_PATTERN, new Date())
+        const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+        const fromIso = browserTimeZone
+          ? TZDate.tz(
+            browserTimeZone,
+            fromLocalDate.getFullYear(),
+            fromLocalDate.getMonth(),
+            fromLocalDate.getDate(),
+            fromLocalDate.getHours(),
+            fromLocalDate.getMinutes(),
+            fromLocalDate.getSeconds(),
+            fromLocalDate.getMilliseconds(),
+          )
+          : fromLocalDate
+
+        const toIso = browserTimeZone
+          ? TZDate.tz(
+            browserTimeZone,
+            toLocalDate.getFullYear(),
+            toLocalDate.getMonth(),
+            toLocalDate.getDate(),
+            toLocalDate.getHours(),
+            toLocalDate.getMinutes(),
+            toLocalDate.getSeconds(),
+            toLocalDate.getMilliseconds(),
+          )
+          : toLocalDate
+
         const params = new URLSearchParams({
-          from: toIso(values.from),
-          to: toIso(values.to),
+          from: new Date(fromIso.getTime()).toISOString(),
+          to: new Date(toIso.getTime()).toISOString(),
           type: values.type,
         })
         window.location.assign(`/data/export?${params.toString()}`)
