@@ -45,30 +45,18 @@ It is based on the current Go, Makefile, npm, and lint configuration.
 - `make package-rpi` - build and package for Raspberry Pi deployment.
 - `make run` - run the app locally
 
-## Architecture And Code Organization
+## Go development
 
+- **You Should** use skill `golang-patterns`
 - Keep packages focused by responsibility:
-  - `config`: loading defaults and YAML config.
-  - `queue`: generic queue, retry policy, circuit breaker.
-  - `repository`: SQLite persistence and retrieval.
-  - `web`: HTTP server, handlers, responses.
-  - `bme280`: hardware and simulated sensor interactions.
 - Prefer extending existing package boundaries over adding cross-cutting helpers in `main`.
 - Keep `main.go` as orchestration and wiring, not business logic.
-
-## Fixes and refactors
-
-- Must use skill `no-workarounds` when planning a solution
-
-## Go Development Guidelines
-
-- Should use skill `golang-patterns`
+- Do not reinvent the wheel prefer using stdlib over coding local implementations or search for established libraries and for for feedback
 
 ## Types And API Design
 
 - Prefer concrete types for internal logic and interfaces at boundaries.
 - Follow existing interface-driven patterns (`Reader`, `Worker`, repository interfaces).
-- Pass `context.Context` as the first parameter for context-aware operations.
 - Use typed config structs rather than untyped maps.
 
 ## Error Handling Guidelines
@@ -81,7 +69,6 @@ It is based on the current Go, Makefile, npm, and lint configuration.
 - Log operational errors with useful context, but avoid leaking secrets.
 - Validate required configuration early at startup.
 
-
 ## Testing Guidelines
 
 - Keep tests table-driven when testing multiple input/output scenarios.
@@ -90,12 +77,17 @@ It is based on the current Go, Makefile, npm, and lint configuration.
 - For concurrency-sensitive code, run `go test -race ./...` before finishing larger changes.
 - Add benchmarks only for code paths where performance is relevant.
 
+## Fixes and refactors
+
+- **You Must** use skill `no-workarounds` when planning a solution
+
 ## Frontend development
 - `./frontend` contains the react frontend code.
-- Should use skills `frontend-design` `ui-uix-pro-max` and `web-design-guidelines`
-- Should use component composition. Use skill `vercel-composition-patterns`
-- Should use skill `vercel-react-best-practices` for React coding
-- Must use shadcn components over coding local component when available. Use skill `shadcn-ui` and `shadcn`
+- **You Should** use skills `frontend-design` `ui-uix-pro-max` and `web-design-guidelines` before coding UI elements
+- **You Should** use component composition. Use skill `vercel-composition-patterns`
+- **You Should** use skill `vercel-react-best-practices` for React coding
+- Should use skill `tailwind-design-system` for CSS and component styling
+- **You Must** use shadcn components over coding local component when available. Use skill `shadcn-ui` and `shadcn`
 
 ## Agent Workflow Recommendations
 
