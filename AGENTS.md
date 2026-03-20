@@ -9,7 +9,6 @@ It is based on the current Go, Makefile, npm, and lint configuration.
 - Entry point: `main.go`.
 - Main packages: `bme280`, `config`, `queue`, `repository`, `web`, `weather`.
 - Build orchestration: `Makefile`.
-- Template minification tooling: npm scripts in `package.json`.
 - Go lint config: `.golangci.yml`.
 - Frontend packages are managed with `npm` 
 
