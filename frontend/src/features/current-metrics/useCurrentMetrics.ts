@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import { ApiError, client } from "../../shared/api/client"
+import { useAppForegroundRefresh } from "../../shared/hooks/useAppForegroundRefresh"
 import type { MeasurementDto } from "../../shared/types/api"
 
 export interface CurrentMetricsState {
@@ -33,34 +34,47 @@ export function useCurrentMetrics(policy: MetricsPolicy = DEFAULT_POLICY): Curre
   const [error, setError] = useState<ApiError | null>(null)
   const [intervalMs, setIntervalMs] = useState<number>(policy.intervalMs)
   const failures = useRef<number>(0)
+  const inFlightRef = useRef<Promise<void> | null>(null)
 
   const runCycle = useCallback(async () => {
-    let attempt = 0
-    for (; ;) {
-      try {
-        const next = await client.getMeasurements(policy.timeoutMs)
-        failures.current = 0
-        setIntervalMs(policy.intervalMs)
-        setData(next)
-        setError(null)
-        setLoading(false)
-        return
-      } catch (unknownError: unknown) {
-        if (attempt < policy.retryCount) {
-          attempt += 1
-          continue
-        }
-
-        failures.current += 1
-        if (failures.current >= policy.degradedThreshold) {
-          setIntervalMs(policy.degradedBackoffMs)
-        }
-        setError(unknownError instanceof ApiError ? unknownError : new ApiError("network", "Atualização dos dados falhou"))
-        setLoading(false)
-        return
-      }
+    if (inFlightRef.current) {
+      return inFlightRef.current
     }
-  }, [])
+
+    const cycle = (async () => {
+      let attempt = 0
+      for (; ;) {
+        try {
+          const next = await client.getMeasurements(policy.timeoutMs)
+          failures.current = 0
+          setIntervalMs(policy.intervalMs)
+          setData(next)
+          setError(null)
+          setLoading(false)
+          return
+        } catch (unknownError: unknown) {
+          if (attempt < policy.retryCount) {
+            attempt += 1
+            continue
+          }
+
+          failures.current += 1
+          if (failures.current >= policy.degradedThreshold) {
+            setIntervalMs(policy.degradedBackoffMs)
+          }
+          setError(unknownError instanceof ApiError ? unknownError : new ApiError("network", "Atualização dos dados falhou"))
+          setLoading(false)
+          return
+        }
+      }
+    })()
+
+    inFlightRef.current = cycle
+    await cycle
+    inFlightRef.current = null
+  }, [policy.degradedBackoffMs, policy.degradedThreshold, policy.intervalMs, policy.retryCount, policy.timeoutMs])
+
+  useAppForegroundRefresh(runCycle)
 
   useEffect(() => {
     let mounted = true
