@@ -10,6 +10,8 @@ export interface CurrentMetricsState {
   error: ApiError | null
   degraded: boolean
   intervalMs: number
+  lastUpdatedAt: Date | null
+  refresh: () => Promise<void>
 }
 
 interface MetricsPolicy {
@@ -33,6 +35,7 @@ export function useCurrentMetrics(policy: MetricsPolicy = DEFAULT_POLICY): Curre
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<ApiError | null>(null)
   const [intervalMs, setIntervalMs] = useState<number>(policy.intervalMs)
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null)
   const failures = useRef<number>(0)
   const inFlightRef = useRef<Promise<void> | null>(null)
 
@@ -40,6 +43,8 @@ export function useCurrentMetrics(policy: MetricsPolicy = DEFAULT_POLICY): Curre
     if (inFlightRef.current) {
       return inFlightRef.current
     }
+
+    setLoading(true)
 
     const cycle = (async () => {
       let attempt = 0
@@ -49,8 +54,8 @@ export function useCurrentMetrics(policy: MetricsPolicy = DEFAULT_POLICY): Curre
           failures.current = 0
           setIntervalMs(policy.intervalMs)
           setData(next)
+          setLastUpdatedAt(new Date())
           setError(null)
-          setLoading(false)
           return
         } catch (unknownError: unknown) {
           if (attempt < policy.retryCount) {
@@ -63,15 +68,18 @@ export function useCurrentMetrics(policy: MetricsPolicy = DEFAULT_POLICY): Curre
             setIntervalMs(policy.degradedBackoffMs)
           }
           setError(unknownError instanceof ApiError ? unknownError : new ApiError("network", "Atualização dos dados falhou"))
-          setLoading(false)
           return
         }
       }
     })()
 
     inFlightRef.current = cycle
-    await cycle
-    inFlightRef.current = null
+    try {
+      await cycle
+    } finally {
+      inFlightRef.current = null
+      setLoading(false)
+    }
   }, [policy.degradedBackoffMs, policy.degradedThreshold, policy.intervalMs, policy.retryCount, policy.timeoutMs])
 
   useAppForegroundRefresh(runCycle)
@@ -103,5 +111,7 @@ export function useCurrentMetrics(policy: MetricsPolicy = DEFAULT_POLICY): Curre
     error,
     degraded: failures.current >= policy.degradedThreshold,
     intervalMs,
+    lastUpdatedAt,
+    refresh: runCycle,
   }
 }

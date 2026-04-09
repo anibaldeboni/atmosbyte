@@ -15,7 +15,7 @@ function formatValue(value: number, unit: string): string {
 }
 
 export function MetricsGrid({ data, loading }: MetricsGridProps): React.JSX.Element {
-  if (loading) {
+  if (loading && !data) {
     return (
       <div className="grid gap-4 md:grid-cols-3" data-testid="metrics-skeleton-grid">
         <Skeleton className="h-24 w-full" />

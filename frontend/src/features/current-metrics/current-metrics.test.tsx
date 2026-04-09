@@ -1,7 +1,7 @@
 import { useCurrentMetrics } from "@/features/current-metrics/useCurrentMetrics"
 import { HomePage } from "@/pages/HomePage"
 import { ApiError, client } from "@/shared/api/client"
-import { render, screen, waitFor } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 
 
 jest.mock("../../shared/api/client", () => ({
@@ -33,6 +33,8 @@ test("loading to success replaces skeleton", async () => {
     error: null,
     degraded: false,
     intervalMs: 30000,
+    lastUpdatedAt: null,
+    refresh: jest.fn().mockResolvedValue(undefined),
   })
 
   const { rerender } = render(<HomePage />)
@@ -51,6 +53,8 @@ test("loading to success replaces skeleton", async () => {
     error: null,
     degraded: false,
     intervalMs: 30000,
+    lastUpdatedAt: new Date("2026-03-17T00:00:00Z"),
+    refresh: jest.fn().mockResolvedValue(undefined),
   })
 
   rerender(<HomePage />)
@@ -74,6 +78,8 @@ test("retains last successful values during transient errors", async () => {
     error: new ApiError("network"),
     degraded: false,
     intervalMs: 30000,
+    lastUpdatedAt: new Date("2026-03-17T00:00:00Z"),
+    refresh: jest.fn().mockResolvedValue(undefined),
   })
 
   render(<HomePage />)
@@ -97,6 +103,8 @@ test("shows degraded notice and 60s interval after 3 failed cycles then recovers
       error: null,
       degraded: true,
       intervalMs: 60000,
+      lastUpdatedAt: new Date("2026-03-17T00:00:00Z"),
+      refresh: jest.fn().mockResolvedValue(undefined),
     })
     .mockReturnValueOnce({
       data: {
@@ -110,6 +118,8 @@ test("shows degraded notice and 60s interval after 3 failed cycles then recovers
       error: null,
       degraded: false,
       intervalMs: 30000,
+      lastUpdatedAt: new Date("2026-03-17T00:03:00Z"),
+      refresh: jest.fn().mockResolvedValue(undefined),
     })
 
   const { rerender } = render(<HomePage />)
@@ -128,4 +138,58 @@ test("shows degraded notice and 60s interval after 3 failed cycles then recovers
     expect(screen.getByText("22.0")).toBeInTheDocument()
     expect(screen.getByText("°C")).toBeInTheDocument()
   })
+})
+
+test("clicking refresh button calls hook refresh", () => {
+  const refresh = jest.fn().mockResolvedValue(undefined)
+
+  mockedUseCurrentMetrics.mockReturnValue({
+    data: {
+      timestamp: "2026-03-17T00:00:00Z",
+      temperature: 25,
+      humidity: 60,
+      pressure: 100900,
+      source: "BME280",
+    },
+    loading: false,
+    error: null,
+    degraded: false,
+    intervalMs: 30000,
+    lastUpdatedAt: new Date("2026-03-17T00:00:00Z"),
+    refresh,
+  })
+
+  render(<HomePage />)
+
+  fireEvent.click(screen.getByRole("button", { name: "Atualizar dados" }))
+
+  expect(refresh).toHaveBeenCalledTimes(1)
+})
+
+test("shows last updated timestamp label using local browser format", () => {
+  const lastUpdatedAt = new Date("2026-03-17T00:00:00Z")
+  const formatted = new Intl.DateTimeFormat(undefined, {
+    dateStyle: "short",
+    timeStyle: "medium",
+  }).format(lastUpdatedAt)
+
+  mockedUseCurrentMetrics.mockReturnValue({
+    data: {
+      timestamp: "2026-03-17T00:00:00Z",
+      temperature: 25,
+      humidity: 60,
+      pressure: 100900,
+      source: "BME280",
+    },
+    loading: false,
+    error: null,
+    degraded: false,
+    intervalMs: 30000,
+    lastUpdatedAt,
+    refresh: jest.fn().mockResolvedValue(undefined),
+  })
+
+  render(<HomePage />)
+
+  expect(screen.getByText(`Última atualização: ${formatted}`)).toBeInTheDocument()
 })

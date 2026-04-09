@@ -1,1 +1,1 @@
-export { ArrowDownTrayIcon, CalendarIcon } from "@heroicons/react/24/outline"
+export { ArrowDownTrayIcon, ArrowPathIcon, CalendarIcon } from "@heroicons/react/24/outline"

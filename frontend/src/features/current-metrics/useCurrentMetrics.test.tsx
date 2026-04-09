@@ -151,3 +151,15 @@ test("deduplicates overlapping polling and foreground refresh calls", async () =
         expect(mockedClient.getMeasurements).toHaveBeenCalledTimes(2)
     })
 })
+
+test("sets lastUpdatedAt when fetch succeeds", async () => {
+    mockedClient.getMeasurements.mockResolvedValue(measurement)
+
+    const { result } = renderHook(() => useCurrentMetrics())
+
+    await waitFor(() => {
+        expect(result.current.loading).toBe(false)
+    })
+
+    expect(result.current.lastUpdatedAt).toBeInstanceOf(Date)
+})
