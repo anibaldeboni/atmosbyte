@@ -1,7 +1,7 @@
+import { alertToneClass, type AlertTone } from "@/shared/ui/alertTone"
+import { cn } from "@/shared/ui/cn"
 import type { PropsWithChildren } from "react"
 
-import { alertToneClass, type AlertTone } from "./alertTone"
-import { cn } from "./cn"
 
 interface InlineAlertProps extends PropsWithChildren {
   tone?: AlertTone

@@ -1,8 +1,8 @@
+import { useCurrentMetrics } from "@/features/current-metrics/useCurrentMetrics"
+import { client } from "@/shared/api/client"
+import type { MeasurementDto } from "@/shared/types/api"
 import { act, renderHook, waitFor } from "@testing-library/react"
 
-import { client } from "../../shared/api/client"
-import type { MeasurementDto } from "../../shared/types/api"
-import { useCurrentMetrics } from "./useCurrentMetrics"
 
 jest.mock("../../shared/api/client", () => ({
     client: {

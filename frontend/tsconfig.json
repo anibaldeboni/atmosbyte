@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "allowJs": false,
@@ -13,9 +17,28 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "types": ["jest", "node", "react", "react-dom", "@testing-library/jest-dom"],
-    "baseUrl": "./src"
+    "types": [
+      "jest",
+      "node",
+      "react",
+      "react-dom",
+      "@testing-library/jest-dom"
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   },
-  "include": ["src", "vite.config.ts", "jest.config.ts", "jest.setup.ts", "tailwind.config.ts"],
-  "exclude": ["dist", "node_modules"]
+  "include": [
+    "src",
+    "vite.config.ts",
+    "jest.config.ts",
+    "jest.setup.ts",
+    "tailwind.config.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
 }

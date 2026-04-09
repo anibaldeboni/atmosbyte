@@ -1,6 +1,6 @@
+import { Card } from "@/shared/ui/Card"
 import type { ReactNode } from "react"
 
-import { Card } from "./Card"
 
 interface MetricCardProps {
   label: string

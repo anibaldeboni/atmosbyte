@@ -1,4 +1,4 @@
-import type { Theme } from "./themeResolver"
+import type { Theme } from "@/app/theme/themeResolver"
 
 const THEME_COLOR_MAP: Record<Theme, string> = {
     light: "#166534",

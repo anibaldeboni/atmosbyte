@@ -1,9 +1,9 @@
+import { useTheme } from "@/app/theme/ThemeProvider"
+import { StatusStrip } from "@/features/status/StatusStrip"
+import { cn } from "@/shared/ui/cn"
+import React from "react"
 import { NavLink, Outlet } from "react-router-dom"
 
-import { useTheme } from "../../app/theme/ThemeProvider"
-import { StatusStrip } from "../../features/status/StatusStrip"
-import { cn } from "./cn"
-import React from "react"
 
 function linkClass(isActive: boolean): string {
   return cn(

@@ -1,6 +1,6 @@
+import { usePwaInstall } from "@/features/pwa/usePwaInstall"
 import { act, fireEvent, render, screen } from "@testing-library/react"
 
-import { usePwaInstall } from "./usePwaInstall"
 
 interface BeforeInstallPromptEventLike extends Event {
     prompt: jest.Mock<Promise<void>, []>

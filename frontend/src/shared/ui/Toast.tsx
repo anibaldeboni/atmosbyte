@@ -1,7 +1,7 @@
+import { alertToneClass, type AlertTone } from "@/shared/ui/alertTone"
+import { cn } from "@/shared/ui/cn"
 import { useCallback, useEffect, useRef, useState, type PropsWithChildren } from "react"
 
-import { alertToneClass, type AlertTone } from "./alertTone"
-import { cn } from "./cn"
 
 interface ToastProps extends PropsWithChildren {
   tone?: AlertTone

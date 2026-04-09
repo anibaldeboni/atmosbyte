@@ -1,7 +1,7 @@
+import { applyThemeToDocument } from "@/app/theme/themeDom"
+import { resolveThemeFromWindow, THEME_STORAGE_KEY, type Theme, isTheme } from "@/app/theme/themeResolver"
 import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react"
 
-import { resolveThemeFromWindow, THEME_STORAGE_KEY, type Theme, isTheme } from "./themeResolver"
-import { applyThemeToDocument } from "./themeDom"
 
 type ThemeContextValue = {
   theme: Theme

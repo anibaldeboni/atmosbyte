@@ -1,7 +1,7 @@
+import { cn } from "@/shared/ui/cn"
 import { cva, type VariantProps } from "class-variance-authority"
 import type { ButtonHTMLAttributes } from "react"
 
-import { cn } from "./cn"
 
 const buttonVariants = cva("rounded-md font-semibold disabled:cursor-not-allowed disabled:opacity-50", {
   variants: {

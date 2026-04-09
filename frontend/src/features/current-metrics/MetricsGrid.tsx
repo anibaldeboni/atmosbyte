@@ -1,7 +1,8 @@
-import type { MeasurementDto } from "../../shared/types/api"
-import { MetricCard } from "../../shared/ui/MetricCard"
-import { Skeleton } from "../../shared/ui/Skeleton"
-import { EmptyState } from "../../shared/ui/EmptyState"
+import type { MeasurementDto } from "@/shared/types/api"
+import { EmptyState } from "@/shared/ui/EmptyState"
+import { MetricCard } from "@/shared/ui/MetricCard"
+import { Skeleton } from "@/shared/ui/Skeleton"
+
 
 function TemperatureIcon(): React.JSX.Element {
   return (

@@ -1,7 +1,7 @@
+import { ApiError, client } from "@/shared/api/client"
+import type { PollingPolicy, StatusLevel, StatusSummary } from "@/shared/types/status"
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import { ApiError, client } from "../../shared/api/client"
-import type { PollingPolicy, StatusLevel, StatusSummary } from "../../shared/types/status"
 
 const DEFAULT_POLICY: PollingPolicy = {
   intervalMs: 30000,

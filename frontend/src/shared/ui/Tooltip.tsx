@@ -1,6 +1,6 @@
+import { cn } from "@/shared/ui/cn"
 import type { PropsWithChildren } from "react"
 
-import { cn } from "./cn"
 
 interface TooltipProps extends PropsWithChildren {
     content: string

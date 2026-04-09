@@ -1,7 +1,7 @@
+import { PwaInstallCta } from "@/features/pwa/PwaInstallCta"
+import { usePwaInstall } from "@/features/pwa/usePwaInstall"
 import { fireEvent, render, screen } from "@testing-library/react"
 
-import { PwaInstallCta } from "./PwaInstallCta"
-import { usePwaInstall } from "./usePwaInstall"
 
 jest.mock("./usePwaInstall")
 

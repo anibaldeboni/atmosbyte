@@ -5,7 +5,7 @@ import type {
   HistoricalQuery,
   MeasurementDto,
   QueueStatsDto,
-} from "../types/api"
+} from "@/shared/types/api"
 
 export type ApiErrorKind = "timeout" | "http" | "parse" | "network"
 

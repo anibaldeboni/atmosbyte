@@ -1,8 +1,8 @@
+import { usePwaInstall } from "@/features/pwa/usePwaInstall"
+import { Button } from "@/shared/ui/Button"
+import { InlineAlert } from "@/shared/ui/InlineAlert"
 import { useState } from "react"
 
-import { Button } from "../../shared/ui/Button"
-import { InlineAlert } from "../../shared/ui/InlineAlert"
-import { usePwaInstall } from "./usePwaInstall"
 
 export function PwaInstallCta(): React.JSX.Element | null {
     const { platform, isInstallAvailable, isPrompting, requestInstall } = usePwaInstall()

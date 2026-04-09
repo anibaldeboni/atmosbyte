@@ -1,9 +1,9 @@
-import React from "react"
+import { HistoricalPage } from "@/pages/HistoricalPage"
+import { client } from "@/shared/api/client"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { parseISO } from "date-fns"
+import React from "react"
 
-import { client } from "../../shared/api/client"
-import { HistoricalPage } from "../../pages/HistoricalPage"
 
 jest.mock("../../features/historical/HistoricalCharts", () => ({
   HistoricalCharts: ({ data, error, loading }: { data: Array<unknown>; error: Error | null; loading: boolean }) => (

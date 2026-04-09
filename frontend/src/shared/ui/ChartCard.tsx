@@ -1,6 +1,6 @@
+import { Card } from "@/shared/ui/Card"
 import type { PropsWithChildren } from "react"
 
-import { Card } from "./Card"
 
 interface ChartCardProps extends PropsWithChildren {
   title: string

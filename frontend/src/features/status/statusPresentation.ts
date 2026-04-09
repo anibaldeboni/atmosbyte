@@ -1,4 +1,4 @@
-import type { StatusLevel } from "../../shared/types/status"
+import type { StatusLevel } from "@/shared/types/status"
 
 export function statusIconToneClass(level: StatusLevel): string {
     if (level === "error") {

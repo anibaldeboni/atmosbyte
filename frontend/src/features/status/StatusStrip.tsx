@@ -1,8 +1,9 @@
-import { useStatusPolling } from "./useStatusPolling"
-import { Skeleton } from "../../shared/ui/Skeleton"
-import { Tooltip } from "../../shared/ui/Tooltip"
-import { cn } from "../../shared/ui/cn"
-import { humanStatus, statusIconToneClass } from "./statusPresentation"
+import { humanStatus, statusIconToneClass } from "@/features/status/statusPresentation"
+import { useStatusPolling } from "@/features/status/useStatusPolling"
+import { cn } from "@/shared/ui/cn"
+import { Skeleton } from "@/shared/ui/Skeleton"
+import { Tooltip } from "@/shared/ui/Tooltip"
+
 
 function ComputerIcon(): React.JSX.Element {
   return (

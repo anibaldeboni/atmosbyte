@@ -1,12 +1,13 @@
+import { AppProviders } from "@/app/AppProviders"
+import { router } from "@/app/router"
+import { Skeleton } from "@/shared/ui/Skeleton"
 import { Suspense } from "react"
 import { createRoot } from "react-dom/client"
 import { RouterProvider } from "react-router-dom"
 
-import { AppProviders } from "./app/AppProviders"
-import { router } from "./app/router"
-import { Skeleton } from "./shared/ui/Skeleton"
+import "@/styles.css"
 import "react-datepicker/dist/react-datepicker.css"
-import "./styles.css"
+
 
 const rootElement = document.getElementById("root")
 

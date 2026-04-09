@@ -1,11 +1,11 @@
+import { ChartCard } from "@/shared/ui/ChartCard"
+import { EmptyState } from "@/shared/ui/EmptyState"
+import { InlineAlert } from "@/shared/ui/InlineAlert"
+import { MetricCard } from "@/shared/ui/MetricCard"
+import { Toast } from "@/shared/ui/Toast"
+import { Tooltip } from "@/shared/ui/Tooltip"
 import { act, fireEvent, render, screen } from "@testing-library/react"
 
-import { ChartCard } from "./ChartCard"
-import { EmptyState } from "./EmptyState"
-import { InlineAlert } from "./InlineAlert"
-import { MetricCard } from "./MetricCard"
-import { Toast } from "./Toast"
-import { Tooltip } from "./Tooltip"
 
 test("metric card renders label and value", () => {
   render(<MetricCard label="Temperature" value="20 C" helper="source" icon={<svg data-testid="metric-icon" />} />)

@@ -1,11 +1,11 @@
-import { lazy, Suspense, useMemo } from "react"
-import { parse } from "date-fns"
+import { HistoricalFiltersForm } from "@/features/historical/HistoricalFiltersForm"
+import { useHistoricalData } from "@/features/historical/useHistoricalData"
+import type { AggregationKind } from "@/shared/types/status"
+import { Skeleton } from "@/shared/ui/Skeleton"
 import { TZDate } from "@date-fns/tz"
+import { parse } from "date-fns"
+import { lazy, Suspense, useMemo } from "react"
 
-import { HistoricalFiltersForm } from "../features/historical/HistoricalFiltersForm"
-import { useHistoricalData } from "../features/historical/useHistoricalData"
-import { Skeleton } from "../shared/ui/Skeleton"
-import type { AggregationKind } from "../shared/types/status"
 
 interface HistoricalPageProps {
 }

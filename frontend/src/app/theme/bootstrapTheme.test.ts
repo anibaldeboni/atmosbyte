@@ -1,4 +1,4 @@
-import { applyInitialTheme } from "./bootstrapTheme"
+import { applyInitialTheme } from "@/app/theme/bootstrapTheme"
 
 function createDocumentMock(windowLike?: Window): Document {
   const root = {

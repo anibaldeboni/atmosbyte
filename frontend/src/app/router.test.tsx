@@ -1,8 +1,8 @@
+import { AppProviders } from "@/app/AppProviders"
+import { routes } from "@/app/router"
 import { render, screen } from "@testing-library/react"
 import { createMemoryRouter, RouterProvider } from "react-router-dom"
 
-import { AppProviders } from "./AppProviders"
-import { routes } from "./router"
 
 jest.mock("../features/status/StatusStrip")
 

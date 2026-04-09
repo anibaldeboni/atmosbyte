@@ -1,4 +1,4 @@
-import { ApiError, client } from "./client"
+import { ApiError, client } from "@/shared/api/client"
 
 const originalFetch = global.fetch
 

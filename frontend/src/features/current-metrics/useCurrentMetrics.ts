@@ -1,8 +1,8 @@
+import { ApiError, client } from "@/shared/api/client"
+import { useAppForegroundRefresh } from "@/shared/hooks/useAppForegroundRefresh"
+import type { MeasurementDto } from "@/shared/types/api"
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import { ApiError, client } from "../../shared/api/client"
-import { useAppForegroundRefresh } from "../../shared/hooks/useAppForegroundRefresh"
-import type { MeasurementDto } from "../../shared/types/api"
 
 export interface CurrentMetricsState {
   data: MeasurementDto | null

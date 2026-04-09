@@ -1,10 +1,10 @@
+import type { AggregationKind } from "@/shared/types/status"
+import { Button } from "@/shared/ui/Button"
+import { InlineAlert } from "@/shared/ui/InlineAlert"
+import { endOfDay, format, intlFormat, isSameDay, isValid, parse, startOfDay, startOfHour, subHours, subMonths } from "date-fns"
 import { forwardRef, useEffect, useRef, useState } from "react"
 import DatePicker from "react-datepicker"
-import { endOfDay, format, intlFormat, isSameDay, isValid, parse, startOfDay, startOfHour, subHours, subMonths } from "date-fns"
 
-import { Button } from "../../shared/ui/Button"
-import { InlineAlert } from "../../shared/ui/InlineAlert"
-import type { AggregationKind } from "../../shared/types/status"
 
 const LOCAL_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm"
 const BROWSER_DATE_TIME_OPTIONS: Intl.DateTimeFormatOptions = {

@@ -1,7 +1,7 @@
+import { ApiError, client } from "@/shared/api/client"
+import type { AggregateMeasurementDto, HistoricalQuery } from "@/shared/types/api"
 import { useCallback, useState } from "react"
 
-import { ApiError, client } from "../../shared/api/client"
-import type { AggregateMeasurementDto, HistoricalQuery } from "../../shared/types/api"
 
 export interface HistoricalDataState {
   data: AggregateMeasurementDto[]

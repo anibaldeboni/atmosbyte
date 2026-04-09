@@ -1,11 +1,11 @@
+import { ApiError } from "@/shared/api/client"
+import type { AggregateMeasurementDto } from "@/shared/types/api"
+import { ChartCard } from "@/shared/ui/ChartCard"
+import { EmptyState } from "@/shared/ui/EmptyState"
+import { InlineAlert } from "@/shared/ui/InlineAlert"
+import { Skeleton } from "@/shared/ui/Skeleton"
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 
-import type { AggregateMeasurementDto } from "../../shared/types/api"
-import { ChartCard } from "../../shared/ui/ChartCard"
-import { EmptyState } from "../../shared/ui/EmptyState"
-import { InlineAlert } from "../../shared/ui/InlineAlert"
-import { Skeleton } from "../../shared/ui/Skeleton"
-import { ApiError } from "shared/api/client"
 
 interface HistoricalChartsProps {
   data: AggregateMeasurementDto[]

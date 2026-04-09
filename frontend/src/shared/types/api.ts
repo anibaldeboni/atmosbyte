@@ -1,4 +1,4 @@
-import type { AggregationKind } from "./status"
+import type { AggregationKind } from "@/shared/types/status"
 
 export interface MeasurementDto {
   timestamp: string

@@ -1,5 +1,6 @@
-import { resolveThemeFromWindow, type Theme } from "./themeResolver"
-import { applyThemeToDocument } from "./themeDom"
+import { applyThemeToDocument } from "@/app/theme/themeDom"
+import { resolveThemeFromWindow, type Theme } from "@/app/theme/themeResolver"
+
 
 export function resolveBootstrapTheme(win: Window): Theme {
   return resolveThemeFromWindow(win)

@@ -1,8 +1,8 @@
+import { ThemeProvider, useTheme } from "@/app/theme/ThemeProvider"
+import { THEME_STORAGE_KEY } from "@/app/theme/themeResolver"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
-import { ThemeProvider, useTheme } from "./ThemeProvider"
-import { THEME_STORAGE_KEY } from "./themeResolver"
 
 function ThemeProbe(): React.JSX.Element {
   const { theme, toggleTheme } = useTheme()

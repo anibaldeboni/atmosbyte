@@ -1,9 +1,9 @@
+import { ThemeProvider } from "@/app/theme/ThemeProvider"
+import { AppShell } from "@/shared/ui/AppShell"
 import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 
-import { ThemeProvider } from "../../app/theme/ThemeProvider"
-import { AppShell } from "./AppShell"
 
 jest.mock("../../features/status/StatusStrip")
 

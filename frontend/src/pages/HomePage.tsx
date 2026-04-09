@@ -1,7 +1,7 @@
-import { MetricsGrid } from "../features/current-metrics/MetricsGrid"
-import { useCurrentMetrics } from "../features/current-metrics/useCurrentMetrics"
-import { PwaInstallCta } from "../features/pwa/PwaInstallCta"
-import { InlineAlert } from "../shared/ui/InlineAlert"
+import { MetricsGrid } from "@/features/current-metrics/MetricsGrid"
+import { useCurrentMetrics } from "@/features/current-metrics/useCurrentMetrics"
+import { PwaInstallCta } from "@/features/pwa/PwaInstallCta"
+import { InlineAlert } from "@/shared/ui/InlineAlert"
 
 interface HomePageProps {
 }

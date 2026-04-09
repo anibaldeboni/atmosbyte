@@ -1,7 +1,7 @@
+import { useStatusPolling } from "@/features/status/useStatusPolling"
+import { client } from "@/shared/api/client"
 import { renderHook, waitFor } from "@testing-library/react"
 
-import { client } from "../../shared/api/client"
-import { useStatusPolling } from "./useStatusPolling"
 
 jest.mock("../../shared/api/client", () => ({
   client: {

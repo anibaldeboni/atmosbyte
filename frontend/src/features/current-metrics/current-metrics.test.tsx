@@ -1,8 +1,8 @@
+import { useCurrentMetrics } from "@/features/current-metrics/useCurrentMetrics"
+import { HomePage } from "@/pages/HomePage"
+import { ApiError, client } from "@/shared/api/client"
 import { render, screen, waitFor } from "@testing-library/react"
 
-import { ApiError, client } from "../../shared/api/client"
-import { HomePage } from "../../pages/HomePage"
-import { useCurrentMetrics } from "./useCurrentMetrics"
 
 jest.mock("../../shared/api/client", () => ({
   client: {

@@ -1,7 +1,7 @@
+import { StatusStrip } from "@/features/status/StatusStrip"
+import { useStatusPolling } from "@/features/status/useStatusPolling"
 import { render, screen } from "@testing-library/react"
 
-import { StatusStrip } from "./StatusStrip"
-import { useStatusPolling } from "./useStatusPolling"
 
 jest.mock("./useStatusPolling")
 

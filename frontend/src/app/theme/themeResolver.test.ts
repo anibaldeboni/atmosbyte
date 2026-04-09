@@ -1,5 +1,5 @@
-import { resolveBootstrapTheme } from "./bootstrapTheme"
-import { resolveThemeFromWindow } from "./themeResolver"
+import { resolveBootstrapTheme } from "@/app/theme/bootstrapTheme"
+import { resolveThemeFromWindow } from "@/app/theme/themeResolver"
 
 type WindowMockOptions = {
   storedTheme?: string | null
