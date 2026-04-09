@@ -1,6 +1,7 @@
 import { usePwaInstall } from "@/features/pwa/usePwaInstall"
 import { Button } from "@/shared/ui/Button"
 import { InlineAlert } from "@/shared/ui/InlineAlert"
+import { ArrowDownTrayIcon } from "@/shared/ui/icons/actions"
 import { useState } from "react"
 
 
@@ -34,11 +35,7 @@ export function PwaInstallCta(): React.JSX.Element | null {
                     disabled={platform === "android" && isPrompting}
                     aria-label={platform === "android" ? "Instalar aplicativo Atmosbyte" : "Ver como instalar no iPhone"}
                 >
-                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
-                        <path d="M12 3v11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                        <path d="m8 10 4 4 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M4 16.8v.7a1.5 1.5 0 0 0 1.5 1.5h13a1.5 1.5 0 0 0 1.5-1.5v-.7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                    </svg>
+                    <ArrowDownTrayIcon className="h-5 w-5" aria-hidden="true" />
                     {platform === "android" ? "Instalar app" : "Como instalar no iPhone"}
                 </Button>
                 {platform === "ios" && showIosGuide ? (

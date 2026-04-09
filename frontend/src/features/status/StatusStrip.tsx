@@ -1,53 +1,10 @@
 import { humanStatus, statusIconToneClass } from "@/features/status/statusPresentation"
 import { useStatusPolling } from "@/features/status/useStatusPolling"
+import { ClockIcon, ComputerIcon, QueueListIcon, ThermometerIcon } from "@/shared/ui/icons/status"
 import { cn } from "@/shared/ui/cn"
 import { Skeleton } from "@/shared/ui/Skeleton"
 import { Tooltip } from "@/shared/ui/Tooltip"
 
-
-function ComputerIcon(): React.JSX.Element {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" role="img">
-      <rect x="3" y="4" width="18" height="14" rx="2" ry="2" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M8 20h8M12 16v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function ThermometerIcon(): React.JSX.Element {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" role="img">
-      <path
-        d="M14 14.76V5a2 2 0 1 0-4 0v9.76a4 4 0 1 0 4 0Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="M12 11v6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function ClockIcon(): React.JSX.Element {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M8 4.7V8l2.3 1.3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function QueueListIcon(): React.JSX.Element {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M4 4.5h8M4 8h8M4 11.5h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="2.2" cy="4.5" r="0.7" fill="currentColor" />
-      <circle cx="2.2" cy="8" r="0.7" fill="currentColor" />
-      <circle cx="2.2" cy="11.5" r="0.7" fill="currentColor" />
-    </svg>
-  )
-}
 
 function fmtDateWithBrowserLocale(dateStr: number): string {
   const date = new Date(dateStr)
