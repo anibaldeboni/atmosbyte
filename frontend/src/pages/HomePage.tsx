@@ -8,7 +8,7 @@ interface HomePageProps {
 }
 
 export function HomePage({ }: HomePageProps): React.JSX.Element {
-  const { data, loading, error, degraded, intervalMs, refresh, lastUpdatedAt } = useCurrentMetrics()
+  const { data, loading, error, refresh } = useCurrentMetrics()
 
   return (
     <div className="space-y-6">
@@ -22,12 +22,9 @@ export function HomePage({ }: HomePageProps): React.JSX.Element {
         </p>
       </section>
       <PwaInstallCta />
-      {degraded ? (
-        <InlineAlert tone="warn">Conexão degradada. Intervalo de polling alterado para {intervalMs / 1000}s.</InlineAlert>
-      ) : null}
-      {error ? <InlineAlert tone="error">{error.message}</InlineAlert> : null}
+      {error ? <InlineAlert tone={error.isDegraded ? "warn" : "error"}>{error.message}</InlineAlert> : null}
       <MetricsGrid data={data} loading={loading} />
-      <MetricsRefreshBar onRefresh={refresh} loading={loading} lastUpdatedAt={lastUpdatedAt} />
+      <MetricsRefreshBar onRefresh={refresh} loading={loading} lastUpdatedAt={data ? new Date(data.timestamp) : null} />
     </div>
   )
 }

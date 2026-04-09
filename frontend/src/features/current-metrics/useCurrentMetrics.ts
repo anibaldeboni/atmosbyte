@@ -7,10 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 export interface CurrentMetricsState {
   data: MeasurementDto | null
   loading: boolean
-  error: ApiError | null
-  degraded: boolean
-  intervalMs: number
-  lastUpdatedAt: Date | null
+  error: MetricsError | null
   refresh: () => Promise<void>
 }
 
@@ -30,12 +27,65 @@ const DEFAULT_POLICY: MetricsPolicy = {
   degradedThreshold: 3,
 }
 
+export class MetricsError extends Error {
+  readonly isDegraded: boolean
+  readonly sourceKind: ApiError["kind"]
+  readonly status?: number
+  readonly details?: string
+
+  private constructor(
+    message: string,
+    options: {
+      isDegraded: boolean
+      sourceKind: ApiError["kind"]
+      status?: number
+      details?: string
+    },
+  ) {
+    super(message)
+    this.name = "MetricsError"
+    this.isDegraded = options.isDegraded
+    this.sourceKind = options.sourceKind
+    this.status = options.status
+    this.details = options.details
+    Object.setPrototypeOf(this, MetricsError.prototype)
+  }
+
+  static fromUnknown(
+    error: unknown,
+    options: {
+      isDegraded: boolean
+      degradedBackoffMs: number
+    },
+  ): MetricsError {
+    const apiError = error instanceof ApiError ? error : new ApiError("network", "Atualização dos dados falhou")
+
+    if (options.isDegraded) {
+      return new MetricsError(
+        `Conexão degradada. Intervalo de polling alterado para ${Math.round(options.degradedBackoffMs / 1000)}s.`,
+        {
+          isDegraded: true,
+          sourceKind: apiError.kind,
+          status: apiError.status,
+          details: apiError.details,
+        },
+      )
+    }
+
+    return new MetricsError(apiError.message, {
+      isDegraded: false,
+      sourceKind: apiError.kind,
+      status: apiError.status,
+      details: apiError.details,
+    })
+  }
+}
+
 export function useCurrentMetrics(policy: MetricsPolicy = DEFAULT_POLICY): CurrentMetricsState {
   const [data, setData] = useState<MeasurementDto | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<ApiError | null>(null)
+  const [error, setError] = useState<MetricsError | null>(null)
   const [intervalMs, setIntervalMs] = useState<number>(policy.intervalMs)
-  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null)
   const failures = useRef<number>(0)
   const inFlightRef = useRef<Promise<void> | null>(null)
 
@@ -54,7 +104,6 @@ export function useCurrentMetrics(policy: MetricsPolicy = DEFAULT_POLICY): Curre
           failures.current = 0
           setIntervalMs(policy.intervalMs)
           setData(next)
-          setLastUpdatedAt(new Date())
           setError(null)
           return
         } catch (unknownError: unknown) {
@@ -64,10 +113,18 @@ export function useCurrentMetrics(policy: MetricsPolicy = DEFAULT_POLICY): Curre
           }
 
           failures.current += 1
-          if (failures.current >= policy.degradedThreshold) {
+          const isDegraded = failures.current >= policy.degradedThreshold
+
+          if (isDegraded) {
             setIntervalMs(policy.degradedBackoffMs)
           }
-          setError(unknownError instanceof ApiError ? unknownError : new ApiError("network", "Atualização dos dados falhou"))
+
+          setError(
+            MetricsError.fromUnknown(unknownError, {
+              isDegraded,
+              degradedBackoffMs: policy.degradedBackoffMs,
+            }),
+          )
           return
         }
       }
@@ -109,9 +166,6 @@ export function useCurrentMetrics(policy: MetricsPolicy = DEFAULT_POLICY): Curre
     data,
     loading,
     error,
-    degraded: failures.current >= policy.degradedThreshold,
-    intervalMs,
-    lastUpdatedAt,
     refresh: runCycle,
   }
 }

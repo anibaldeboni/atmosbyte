@@ -1,5 +1,5 @@
-import { useCurrentMetrics } from "@/features/current-metrics/useCurrentMetrics"
-import { client } from "@/shared/api/client"
+import { MetricsError, useCurrentMetrics } from "@/features/current-metrics/useCurrentMetrics"
+import { ApiError, client } from "@/shared/api/client"
 import type { MeasurementDto } from "@/shared/types/api"
 import { act, renderHook, waitFor } from "@testing-library/react"
 
@@ -11,9 +11,16 @@ jest.mock("../../shared/api/client", () => ({
         getQueue: jest.fn(),
     },
     ApiError: class extends Error {
-        constructor(message: string) {
+        kind: string
+        status?: number
+        details?: string
+
+        constructor(kind: string, message: string, status?: number, details?: string) {
             super(message)
             this.name = "ApiError"
+            this.kind = kind
+            this.status = status
+            this.details = details
         }
     },
 }))
@@ -152,8 +159,8 @@ test("deduplicates overlapping polling and foreground refresh calls", async () =
     })
 })
 
-test("sets lastUpdatedAt when fetch succeeds", async () => {
-    mockedClient.getMeasurements.mockResolvedValue(measurement)
+test("translates ApiError into a non-degraded MetricsError", async () => {
+    mockedClient.getMeasurements.mockRejectedValue(new ApiError("network", "Falha na requisição de rede"))
 
     const { result } = renderHook(() => useCurrentMetrics())
 
@@ -161,5 +168,41 @@ test("sets lastUpdatedAt when fetch succeeds", async () => {
         expect(result.current.loading).toBe(false)
     })
 
-    expect(result.current.lastUpdatedAt).toBeInstanceOf(Date)
+    expect(result.current.error).toBeInstanceOf(MetricsError)
+    expect(result.current.error?.message).toBe("Falha na requisição de rede")
+    expect(result.current.error?.isDegraded).toBe(false)
+    expect(result.current.error?.sourceKind).toBe("network")
+})
+
+test("returns a degraded MetricsError after repeated failures", async () => {
+    mockedClient.getMeasurements.mockRejectedValue(new ApiError("timeout", "A requisição excedeu o tempo limite"))
+
+    const { result } = renderHook(() =>
+        useCurrentMetrics({
+            intervalMs: 100,
+            degradedBackoffMs: 60000,
+            timeoutMs: 8000,
+            retryCount: 0,
+            degradedThreshold: 3,
+        }),
+    )
+
+    await waitFor(() => {
+        expect(mockedClient.getMeasurements).toHaveBeenCalledTimes(1)
+        expect(result.current.loading).toBe(false)
+    })
+
+    await act(async () => {
+        jest.advanceTimersByTime(200)
+    })
+
+    await waitFor(() => {
+        expect(mockedClient.getMeasurements.mock.calls.length).toBeGreaterThanOrEqual(3)
+        expect(result.current.error?.isDegraded).toBe(true)
+    })
+
+    expect(result.current.error).toBeInstanceOf(MetricsError)
+    expect(result.current.error?.isDegraded).toBe(true)
+    expect(result.current.error?.message).toBe("Conexão degradada. Intervalo de polling alterado para 60s.")
+    expect(result.current.error?.sourceKind).toBe("timeout")
 })

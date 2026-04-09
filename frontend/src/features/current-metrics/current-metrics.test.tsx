@@ -1,19 +1,7 @@
 import { useCurrentMetrics } from "@/features/current-metrics/useCurrentMetrics"
+import type { CurrentMetricsState, MetricsError } from "@/features/current-metrics/useCurrentMetrics"
 import { HomePage } from "@/pages/HomePage"
-import { ApiError, client } from "@/shared/api/client"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
-
-
-jest.mock("../../shared/api/client", () => ({
-  client: {
-    getMeasurements: jest.fn(),
-    getHealth: jest.fn(),
-    getQueue: jest.fn(),
-  },
-  ApiError: class extends Error { },
-}))
-
-const mockedClient = client as jest.Mocked<typeof client>
 
 jest.mock("./useCurrentMetrics", () => ({
   useCurrentMetrics: jest.fn(),
@@ -21,27 +9,39 @@ jest.mock("./useCurrentMetrics", () => ({
 
 const mockedUseCurrentMetrics = useCurrentMetrics as jest.MockedFunction<typeof useCurrentMetrics>
 
+function createMetricsError(message: string, isDegraded = false): MetricsError {
+  return {
+    name: "MetricsError",
+    message,
+    isDegraded,
+    sourceKind: "network",
+  } as MetricsError
+}
+
+function createMetricsState(overrides: Partial<CurrentMetricsState> = {}): CurrentMetricsState {
+  return {
+    data: null,
+    loading: false,
+    error: null,
+    refresh: jest.fn().mockResolvedValue(undefined),
+    ...overrides,
+  }
+}
+
 beforeEach(() => {
   mockedUseCurrentMetrics.mockReset()
-  mockedClient.getMeasurements.mockReset()
 })
 
 test("loading to success replaces skeleton", async () => {
-  mockedUseCurrentMetrics.mockReturnValue({
-    data: null,
+  mockedUseCurrentMetrics.mockReturnValue(createMetricsState({
     loading: true,
-    error: null,
-    degraded: false,
-    intervalMs: 30000,
-    lastUpdatedAt: null,
-    refresh: jest.fn().mockResolvedValue(undefined),
-  })
+  }))
 
   const { rerender } = render(<HomePage />)
 
   expect(screen.getByTestId("metrics-skeleton-grid")).toBeInTheDocument()
 
-  mockedUseCurrentMetrics.mockReturnValue({
+  mockedUseCurrentMetrics.mockReturnValue(createMetricsState({
     data: {
       timestamp: "2026-03-17T00:00:00Z",
       temperature: 25,
@@ -49,13 +49,7 @@ test("loading to success replaces skeleton", async () => {
       pressure: 100900,
       source: "BME280",
     },
-    loading: false,
-    error: null,
-    degraded: false,
-    intervalMs: 30000,
-    lastUpdatedAt: new Date("2026-03-17T00:00:00Z"),
-    refresh: jest.fn().mockResolvedValue(undefined),
-  })
+  }))
 
   rerender(<HomePage />)
 
@@ -66,7 +60,7 @@ test("loading to success replaces skeleton", async () => {
 })
 
 test("retains last successful values during transient errors", async () => {
-  mockedUseCurrentMetrics.mockReturnValue({
+  mockedUseCurrentMetrics.mockReturnValue(createMetricsState({
     data: {
       timestamp: "2026-03-17T00:00:00Z",
       temperature: 21,
@@ -74,24 +68,19 @@ test("retains last successful values during transient errors", async () => {
       pressure: 100800,
       source: "BME280",
     },
-    loading: false,
-    error: new ApiError("network"),
-    degraded: false,
-    intervalMs: 30000,
-    lastUpdatedAt: new Date("2026-03-17T00:00:00Z"),
-    refresh: jest.fn().mockResolvedValue(undefined),
-  })
+    error: createMetricsError("Falha temporária na atualização"),
+  }))
 
   render(<HomePage />)
 
   expect(screen.getByText("21.0")).toBeInTheDocument()
   expect(screen.getByText("°C")).toBeInTheDocument()
-  expect(screen.getByText("network")).toBeInTheDocument()
+  expect(screen.getByText("Falha temporária na atualização")).toBeInTheDocument()
 })
 
 test("shows degraded notice and 60s interval after 3 failed cycles then recovers", async () => {
   mockedUseCurrentMetrics
-    .mockReturnValueOnce({
+    .mockReturnValueOnce(createMetricsState({
       data: {
         timestamp: "2026-03-17T00:00:00Z",
         temperature: 20,
@@ -99,14 +88,9 @@ test("shows degraded notice and 60s interval after 3 failed cycles then recovers
         pressure: 100700,
         source: "BME280",
       },
-      loading: false,
-      error: null,
-      degraded: true,
-      intervalMs: 60000,
-      lastUpdatedAt: new Date("2026-03-17T00:00:00Z"),
-      refresh: jest.fn().mockResolvedValue(undefined),
-    })
-    .mockReturnValueOnce({
+      error: createMetricsError("Conexão degradada. Intervalo de polling alterado para 60s.", true),
+    }))
+    .mockReturnValueOnce(createMetricsState({
       data: {
         timestamp: "2026-03-17T00:03:00Z",
         temperature: 22,
@@ -114,13 +98,7 @@ test("shows degraded notice and 60s interval after 3 failed cycles then recovers
         pressure: 100710,
         source: "BME280",
       },
-      loading: false,
-      error: null,
-      degraded: false,
-      intervalMs: 30000,
-      lastUpdatedAt: new Date("2026-03-17T00:03:00Z"),
-      refresh: jest.fn().mockResolvedValue(undefined),
-    })
+    }))
 
   const { rerender } = render(<HomePage />)
 
@@ -143,7 +121,7 @@ test("shows degraded notice and 60s interval after 3 failed cycles then recovers
 test("clicking refresh button calls hook refresh", () => {
   const refresh = jest.fn().mockResolvedValue(undefined)
 
-  mockedUseCurrentMetrics.mockReturnValue({
+  mockedUseCurrentMetrics.mockReturnValue(createMetricsState({
     data: {
       timestamp: "2026-03-17T00:00:00Z",
       temperature: 25,
@@ -151,13 +129,8 @@ test("clicking refresh button calls hook refresh", () => {
       pressure: 100900,
       source: "BME280",
     },
-    loading: false,
-    error: null,
-    degraded: false,
-    intervalMs: 30000,
-    lastUpdatedAt: new Date("2026-03-17T00:00:00Z"),
     refresh,
-  })
+  }))
 
   render(<HomePage />)
 
@@ -167,29 +140,23 @@ test("clicking refresh button calls hook refresh", () => {
 })
 
 test("shows last updated timestamp label using local browser format", () => {
-  const lastUpdatedAt = new Date("2026-03-17T00:00:00Z")
+  const timestamp = "2026-03-17T00:00:00Z"
   const formatted = new Intl.DateTimeFormat(undefined, {
     dateStyle: "short",
     timeStyle: "medium",
-  }).format(lastUpdatedAt)
+  }).format(new Date(timestamp))
 
-  mockedUseCurrentMetrics.mockReturnValue({
+  mockedUseCurrentMetrics.mockReturnValue(createMetricsState({
     data: {
-      timestamp: "2026-03-17T00:00:00Z",
+      timestamp,
       temperature: 25,
       humidity: 60,
       pressure: 100900,
       source: "BME280",
     },
-    loading: false,
-    error: null,
-    degraded: false,
-    intervalMs: 30000,
-    lastUpdatedAt,
-    refresh: jest.fn().mockResolvedValue(undefined),
-  })
+  }))
 
   render(<HomePage />)
 
-  expect(screen.getByText(`Última atualização: ${formatted}`)).toBeInTheDocument()
+  expect(screen.getByText(`Atualizado em ${formatted}`)).toBeInTheDocument()
 })
