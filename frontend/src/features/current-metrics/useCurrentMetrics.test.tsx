@@ -139,8 +139,8 @@ test("deduplicates overlapping polling and foreground refresh calls", async () =
         window.dispatchEvent(new Event("focus"))
     })
 
-    act(() => {
-        jest.advanceTimersByTime(100)
+    await act(async () => {
+        jest.advanceTimersByTime(1000)
     })
 
     expect(mockedClient.getMeasurements).toHaveBeenCalledTimes(1)
@@ -151,7 +151,7 @@ test("deduplicates overlapping polling and foreground refresh calls", async () =
     })
 
     await act(async () => {
-        jest.advanceTimersByTime(100)
+        jest.advanceTimersByTime(1000)
     })
 
     await waitFor(() => {
@@ -193,7 +193,7 @@ test("returns a degraded MetricsError after repeated failures", async () => {
     })
 
     await act(async () => {
-        jest.advanceTimersByTime(200)
+        jest.advanceTimersByTime(3000)
     })
 
     await waitFor(() => {

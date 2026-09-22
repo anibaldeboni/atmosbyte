@@ -143,18 +143,23 @@ export function useCurrentMetrics(policy: MetricsPolicy = DEFAULT_POLICY): Curre
 
   useEffect(() => {
     let mounted = true
+    let lastTick = Date.now()
 
     const tick = async () => {
       if (!mounted) {
         return
       }
+      lastTick = Date.now()
       await runCycle()
     }
 
     void tick()
+    // ponytail: watchdog timer handles iOS PWA sleep/wake cycle without complex visibility event listeners
     const id = window.setInterval(() => {
-      void tick()
-    }, intervalMs)
+      if (Date.now() - lastTick >= intervalMs) {
+        void tick()
+      }
+    }, 1000)
 
     return () => {
       mounted = false
