@@ -2,10 +2,6 @@
 
 A comprehensive weather data collection, processing, and visualization system built in Go, featuring centralized YAML configuration, BME280 sensor integration, generic queue system with retry/circuit breaker patterns, SQLite persistence, and a real-time web interface.
 
-## 💽 Raspberry Pi installation
-
-Check the [Installation Guide](INSTALL-RPI.md)
-
 ## 🎯 Key Features
 
 ### **Centralized Configuration System**
