@@ -47,7 +47,8 @@ help: ## Show this help message
 	@echo ""
 	@echo "$(YELLOW)Raspberry Pi deployment:$(RESET)"
 	@echo "  build-rpi          Build binary for Raspberry Pi"
-	@echo "  package-rpi        Create deployment package"
+	@echo "  package-rpi        Create deployment package (legacy)"
+	@echo "  build-package      Build deb and tar.gz packages locally using GoReleaser"
 	@echo ""
 	@echo "$(YELLOW)Development workflow:$(RESET)"
 	@echo "  make run                      # Build frontend and run locally"
@@ -149,6 +150,12 @@ package-rpi: build-rpi ## Create deployment package for Raspberry Pi
 		-C $(BUILD_DIR)/linux-arm64 $(PROJECT_NAME) \
 		-C ../../ atmosbyte.service install-service.sh atmosbyte.yaml.example
 	@echo "$(GREEN)✓ Deployment package created: dist/atmosbyte-rpi-$(BUILD_TIME).tar.gz$(RESET)"
+
+.PHONY: build-package
+build-package: ## Build deb and tar.gz packages locally using GoReleaser
+	@echo "$(YELLOW)Building packages locally using GoReleaser...$(RESET)"
+	@goreleaser release --snapshot --clean
+	@echo "$(GREEN)✓ Packages created in dist/ directory$(RESET)"
 
 .PHONY: run
 run: build ## Build frontend + backend and run locally

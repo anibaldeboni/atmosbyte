@@ -1,0 +1,53 @@
+version: 2
+
+project_name: atmosbyte
+
+before:
+  hooks:
+    - make frontend-sync
+
+builds:
+  - id: atmosbyte
+    main: .
+    binary: atmosbyte
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - arm64
+    ldflags:
+      - -s -w
+
+archives:
+  - id: atmosbyte-archive
+    format: tar.gz
+    builds:
+      - atmosbyte
+    files:
+      - src: atmosbyte.service
+        dst: atmosbyte.service
+      - src: atmosbyte.yaml.example
+        dst: atmosbyte.yaml
+
+nfpms:
+  - id: atmosbyte
+    package_name: atmosbyte
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    vendor: "anibaldeboni"
+    homepage: "https://github.com/anibaldeboni/atmosbyte"
+    maintainer: "anibaldeboni"
+    description: "Atmosbyte Weather Data Processing System"
+    formats:
+      - deb
+    bindir: /opt/atmosbyte
+    contents:
+      - src: atmosbyte.service
+        dst: /etc/systemd/system/atmosbyte.service
+      - src: atmosbyte.yaml.example
+        dst: /opt/atmosbyte/atmosbyte.yaml
+        type: config
+    scripts:
+      preinstall: scripts/preinstall.sh
+      postinstall: scripts/postinstall.sh
+      preremove: scripts/preremove.sh
