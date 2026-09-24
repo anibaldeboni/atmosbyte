@@ -252,8 +252,8 @@ func BenchmarkHandleMeasurements(b *testing.B) {
 	server := NewServer(context.Background(), sensor, testConfig(), queueProvider, &MockMeasurementRepository{})
 
 	req := httptest.NewRequest(http.MethodGet, "/measurements", nil)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		w := httptest.NewRecorder()
 		server.handleMeasurements(w, req)
 	}
